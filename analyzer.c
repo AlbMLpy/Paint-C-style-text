@@ -1,19 +1,7 @@
 #include "analyzer.h"
 #include <stdlib.h>
 #include <ctype.h>
-
-/**
- * This function, in_set, allows you to realize whether a set contains a value.
- * Input parameters: 
- *     - "value" is a character being checked to be in set; 
- *     - "set" is an any set you put into function;
- *     - "size_set" is size of set you put into function;
- * Output parameters:
- *     - function returns 1 if the value is in the set;
- *     - function returns 0 if the value is not in the set;
- * Important: this function supposes that it is used in a regular way;
- */    
-static int in_set(int value, char *set, int size_set);
+#include <string.h>
 
 /**
  * This function, paint_return_analyzer, allows you to print an array=buffer up to 
@@ -189,16 +177,6 @@ static void paint_return_analyzer(FILE *fd, int *buffer, int position, char pain
     free(buffer);
     fseek(fd, back, SEEK_CUR);
     return;
-}
-
-static int in_set(int value, char *set, int size_set) 
-{
-    for (int i = 0; i < size_set; ++i) {
-        if (value == set[i]) {
-	        return TRUE;
-	    }
-    }
-    return FALSE;
 }
 
 static int* check_give_memory(int *buffer, int *size_buf, int position)
@@ -391,7 +369,7 @@ static int char_token(int *buffer, int size_buf, int position, FILE *fd)
 			                continue;
 			            } 
 			            break;
-		            } else if (in_set(buffer[position], simple_escape, SIZE_SET_SIM_ESC)) {
+		            } else if (memchr(simple_escape, buffer[position], SIZE_SET_SIM_ESC) != NULL) {
 		                break;
 		            } else {
 		                paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
@@ -541,7 +519,7 @@ static int string_token(int *buffer, int size_buf, int position, FILE *fd)
 			                continue;
 			            } 
 			            break;
-		            } else if (in_set(buffer[position], simple_escape, SIZE_SET_SIM_ESC)) {
+		            } else if (memchr(simple_escape, buffer[position], SIZE_SET_SIM_ESC) != NULL) {
 		                break;
 		            } else {
 		                paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
@@ -886,7 +864,7 @@ void analyzer(FILE *fd)
 	        continue;
 
 	    }   	    
-	    if (in_set(*buf, set_id_ch_str, SIZE_SET_ID_CH_STR)) {
+	    if (memchr(set_id_ch_str, *buf, SIZE_SET_ID_CH_STR) != NULL) {
 	        init = fgetc(fd);
 	        position += 1;
 	        if (init == EOF) {
@@ -997,7 +975,7 @@ void analyzer(FILE *fd)
 	        continue;
 
 	    }
-        if (in_set(*buf, punctuators, SIZE_SET_PUNCT)) {
+        if (memchr(punctuators, *buf, SIZE_SET_PUNCT) != NULL) {
             paint_return_analyzer(fd, buf, position, PUNCT_PAINT, 0);
 	        continue;
         }
