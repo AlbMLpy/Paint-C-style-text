@@ -109,12 +109,6 @@ static int comment_new_token(int *buffer, int size_buf, int position, FILE *fd);
 static int comment_old_token(int *buffer, int size_buf, int position, FILE *fd);
 
 /**
- * This function, out_buf, allows you to print the array=buffer to stdout 
- * up to position(included). 
- */ 
-static void out_buf(int *buffer, int position);
-
-/**
  * This function, out_buf_p, allows you to print the array=buffer to stdout
  * up to position(included) in colour defined by paint.
  */ 
@@ -734,18 +728,11 @@ static int comment_old_token(int *buffer, int size_buf, int position, FILE *fd)
     return 0;
 }	
 
-static void out_buf(int *buffer, int position) 
-{
-    for (int i = 0; i <= position; i++) {
-         putchar(buffer[i]);
-    }
-}	
-
 static void print_buf_def_color(int *buffer, int position, char *paint)
 {
     static char *no_paint_code = "\033[0m"; // cancel paint
     printf("%s", paint);
-    out_buf(buffer, position);
+    fwrite(buffer, sizeof(int), position + 1, stdout);
     printf("%s", no_paint_code);
 }       	
 
@@ -789,7 +776,7 @@ static void out_buf_p(int *buffer, int position, char paint)
 	    break;
 
     default:
-        out_buf(buffer, position);
+        fwrite(buffer, sizeof(int), position + 1, stdout);
     }
 }	
 
