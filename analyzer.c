@@ -3,212 +3,6 @@
 #include <ctype.h>
 #include <string.h>
 
-/**
- * This function, paint_return_analyzer, allows you to print an array=buffer up to 
- * position(included) in different strictly known colours, free an array=buffer, 
- * and move file pointer from current state to back steps.
- * Input parameters:
- *     - "fd" is of FILE* type (stdio.h) and it is a pointer on OPENED previously file;
- *     - "buffer" is a dynamic array created previously;
- *     - "position" is an index in buffer up to that(included) we want our function to 
- *       interact with buffer; 
- *     - "paint" is a reserved constant to be interpreted as colour;
- *     - "back" is a number of steps to shift from current position in file via fd;
- * Important: this function supposes that it is used in a regular way;
- */ 
-static void
-paint_return_analyzer(FILE *fd, int *buffer, int position, char paint, int back);
-
-/**
- * This function, int_dec_token, allows you to enter some(undefined) characters from opened
- * file via fd into dynamic buffer from position up to character that cannot be 
- * in decimal constant, print this buffer in orange colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * Important: this function is not supposed to be used out of "analyzer" function;
- * Input parameters:
- *     - "buffer" is a dynamic array in which characters from file are stored;
- *     - "size_buf" is a size of "buffer";
- *     - "position" is an index in buffer from that we want our function to 
- *       interact with buffer;
- *     - "fd" is of FILE* type (stdio.h) and it is a pointer on OPENED previously file;
- * Output parameters:
- *     - function returns 0 if everything is fine;
- *     - function returns -1 if we have a problem with memory(dynamic memory is full);
- * Important: this function supposes that it is used in a regular way;
- */
-static int*
-int_dec_token(
-        int *buffer,
-        int size_buf,
-        int *position,
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-/**
- *
- *
- *
- */ 
-static int*
-set_shift_token_pos_ret_buf(
-        int *buf,
-        char *token,
-        int *sft,
-        int *pos,
-        char val_token,
-        int val_sft,
-        int val_pos);
-
-/**
- * This function, int_oct_token, allows you to enter some(undefined) characters from opened 
- * file via fd into dynamic buffer from position up to character that cannot be 
- * in octuple constant, print this buffer in orange colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * All the next requirements and descriptions are the same as in "int_dec_token"
- */ 
-static int*
-int_oct_token(
-        int *buffer,
-        int size_buf,
-        int *position,
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-
-/**
- * This function, char_token, allows you to enter some(undefined) characters from opened
- * file via fd into dynamic buffer from position up to character that cannot be
- * in char constant, print this buffer in yellow colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * All the next requirements and descriptions are the same as in "int_dec_token".
- */ 
-static int*
-char_token(
-        int *buffer,
-        int size_buf,
-        int *position,
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-
-/**
- * This function, string_token, allows you to enter some(undefined) characters from opened
- * file via fd into dynamic buffer from position up to character that cannot be
- * in string constant, print this buffer in green colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * All the next requirements and descriptions are the same as in "int_dec_token".
- */ 
-static int*
-string_token(
-        int *buffer,
-        int size_buf,
-        int *position,
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-
-/**
- * This function, equal_sets, allows you to compare two arrays=buf=set up to index=position.
- * Output parameters:
- *     - function returns 1 if sets are equal;
- *     - function returns 0 if sets are not equal;
- */
-static int
-equal_sets(int *buffer, int pos_buf_set, char *set);
-
-/**
- * This function, is_key, allows you realize whether buffer=array is a key token in C.
- * Output parameters:
- *     - function returns 1 if buffer is equal to key token;
- *     - function returns 0 if buffer is not equal key token;
- * Important: this function is not supposed to be used out of "analyzer" function.
- */ 
-static int
-is_key(int *buffer, int position);
-
-/**
- * This function, ident_token, allows you to enter some(undefined) characters from opened
- * file via fd into dynamic buffer from position up to character that cannot be
- * in identifier, print this buffer in pink colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * All the next requirements and descriptions are the same as in "int_dec_token".
- */ 
-static int*
-ident_token(
-        int *buffer,
-        int size_buf,
-        int *position,
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-
-/**
- * This function, comment_new_token, allows you to enter some(undefined) characters from opened
- * file via fd into dynamic buffer from position up to character that cannot be
- * in comment, print this buffer in brown colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * All the next requirements and descriptions are the same as in "int_dec_token".
- */ 
-static int*
-comment_new_token(
-        int *buffer,
-        int size_buf,
-        int *position, 
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-
-/**
- * This function, comment_old_token, allows you to enter some(undefined) characters from opened
- * file via fd into dynamic buffer from position up to character that cannot be
- * in comment, print this buffer in brown colour if it`s regular, and no colour if
- * it is not, free buffer, shift file pointer.
- * All the next requirements and descriptions are the same as in "int_dec_token".
- */ 
-static int*
-comment_old_token(
-        int *buffer,
-        int size_buf,
-        int *position,
-        FILE *fd,
-        char *what_token,
-        int *shift_in_file);
-
-/**
- * This function, out_buf_p, allows you to print the array=buffer to stdout
- * up to position(included) in colour defined by paint.
- */ 
-static void
-out_buf_p(int *buffer, int position, char paint);
-
-/**
- * This function, print_buf_def_color, helps out_buf_p to print buffer 
- * in defined color.
- */ 
-static void
-print_buf_def_color(int *buffer, int position, char *paint);
-
-/**
- * This function, check_give_memory, is used to give memory and check special 
- * conditions of that.
- * Input parameters:
- *     - buffer is an array we can broaden;
- *     - position is a index that notices about end of buffer;
- *     - paint is a string presenting color;
- * Output parameters:
- *     - function returns NULL if it could not give memory;
- *     - function returns number != 0 if buffer was broaden up to 2 times;
- */
-static int*
-check_give_memory(int *buffer, int *size_buf, int position);
-
-/**
- * This function, inc_pos_read_to_buf, increases position, and reads from opened
- * file one character.
- */ 
-void
-inc_pos_read_to_buf(int *buffer, int *position, FILE *fd);
-
 // These constants reflect requrements of design
 enum { BUF_INIT = 1024, TRUE = 1, FALSE = 0, SIZE_SET_ID_CH_STR = 2, 
        SIZE_SET_PUNCT = 13, SIZE_SET_SIM_ESC = 11, SIZE_UCN = 9 };
@@ -236,9 +30,242 @@ enum { ONE_LETTER = 1, TWO_LETTERS = 2, SIZE_UNS = 8, SIZE_VOID = 4,
 // These constants reflect requrements of design
 enum { SH_ONE_BK = -1, MUL_TWO = 2, SH_TWO_BK = -2, DIV_F = 4 };
 
+// Need these sets according to standart C
 static char punctuators[] = { '+', '-', '&', '*', '~', '!', '/', '%', '<', '>', '^', '|', '=' };
 static char set_id_ch_str[] = { 'L', 'U' };
 static char simple_escape[] = { '\'', '\"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v' };
+
+// They count number of tokens
+static long strange_tok = 0;
+static long int_tok = 0;
+static long key_tok = 0;
+static long char_tok = 0;
+static long str_tok = 0;
+static long ident_tok = 0;
+static long comment_tok = 0;
+static long punct_tok = 0;
+
+/**
+ * This function, int_dec_token, allows you to enter some(undefined) characters from opened
+ * file via fd into dynamic buffer from position up to character that cannot be 
+ * in decimal constant, give out this buffer if it`s regular, and null otherwise.
+ * Important: this function is not supposed to be used out of "analyzer" function;
+ * Input parameters:
+ *     - "buffer" is a dynamic array in which characters from file are stored;
+ *     - "size_buf" is a size of "buffer";
+ *     - "*position" is an index in buffer from that we want our function to 
+ *       interact with buffer;
+ *     - "fd" is of FILE* type (stdio.h) and it is a pointer on OPENED previously file;
+ *     - "what_token" is a char constant needed to define buffer token
+ *     - "shift_in_file" is back shift if file for syncronization
+ * Output parameters:
+ *     - function returns pointer on buffer if everything is fine;
+ *     - function returns NULL if we have a problem with memory(dynamic memory is full);
+ * Important: this function supposes that it is used in a regular way;
+ */
+static int*
+int_dec_token(
+        int *buffer,
+        int size_buf,
+        int *position,
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, int_oct_token, allows you to enter some(undefined) characters from opened 
+ * file via fd into dynamic buffer from position up to character that cannot be 
+ * in octuple constant, give out this buffer if it`s regular, and null otherwise.
+ * All the next requirements and descriptions are the same as in "int_dec_token"
+ */ 
+static int*
+int_oct_token(
+        int *buffer,
+        int size_buf,
+        int *position,
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, char_token, allows you to enter some(undefined) characters from opened
+ * file via fd into dynamic buffer from position up to character that cannot be
+ * in char constant, give out this buffer if it`s regular, and null otherwise.
+ * All the next requirements and descriptions are the same as in "int_dec_token".
+ */ 
+static int*
+char_token(
+        int *buffer,
+        int size_buf,
+        int *position,
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, string_token, allows you to enter some(undefined) characters from opened
+ * file via fd into dynamic buffer from position up to character that cannot be
+ * in string constant, give out this buffer if it`s regular, and null otherwise.
+ * All the next requirements and descriptions are the same as in "int_dec_token".
+ */ 
+static int*
+string_token(
+        int *buffer,
+        int size_buf,
+        int *position,
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, ident_token, allows you to enter some(undefined) characters from opened
+ * file via fd into dynamic buffer from position up to character that cannot be
+ * in identifier, give out this buffer if it`s regular, and null otherwise.
+ * All the next requirements and descriptions are the same as in "int_dec_token".
+ */ 
+static int*
+ident_token(
+        int *buffer,
+        int size_buf,
+        int *position,
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, comment_new_token, allows you to enter some(undefined) characters from opened
+ * file via fd into dynamic buffer from position up to character that cannot be
+ * in comment, give out this buffer if it`s regular, and null otherwise.
+ * All the next requirements and descriptions are the same as in "int_dec_token".
+ */ 
+static int*
+comment_new_token(
+        int *buffer,
+        int size_buf,
+        int *position, 
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, comment_old_token, allows you to enter some(undefined) characters from opened
+ * file via fd into dynamic buffer from position up to character that cannot be
+ * in comment, give out this buffer if it`s regular, and null otherwise.
+ * All the next requirements and descriptions are the same as in "int_dec_token".
+ */ 
+static int*
+comment_old_token(
+        int *buffer,
+        int size_buf,
+        int *position,
+        FILE *fd,
+        char *what_token,
+        int *shift_in_file);
+
+/**
+ * This function, inc_token_free_buf_file_back, allows you to increase token variable, free an array=buffer, 
+ * and move file pointer from current state to back steps.
+ * Input parameters:
+ *     - "fd" is of FILE* type (stdio.h) and it is a pointer on OPENED previously file;
+ *     - "buffer" is a dynamic array created previously;
+ *     - "token" is a reserved constant to be interpreted as token;
+ *     - "back" is a number of steps to shift from current position in file via fd;
+ * Important: this function supposes that it is used in a regular way;
+ */ 
+static void
+inc_token_free_buf_file_back(FILE *fd, int *buffer, char token, int back);
+
+/**
+ * This function, print_stat, allows you to print statistics on file of tokens.
+ */ 
+static void
+print_stat(void);
+
+/**
+ * This function, paint_return_analyzer, allows you to print an array=buffer up to 
+ * position(included) in different strictly known colours, free an array=buffer, 
+ * and move file pointer from current state to back steps.
+ * Input parameters:
+ *     - "fd" is of FILE* type (stdio.h) and it is a pointer on OPENED previously file;
+ *     - "buffer" is a dynamic array created previously;
+ *     - "position" is an index in buffer up to that(included) we want our function to 
+ *       interact with buffer; 
+ *     - "paint" is a reserved constant to be interpreted as colour;
+ *     - "back" is a number of steps to shift from current position in file via fd;
+ * Important: this function supposes that it is used in a regular way;
+ */ 
+static void
+paint_return_analyzer(FILE *fd, int *buffer, int position, char paint, int back);
+
+/**
+ * This function, out_buf_p, allows you to print the array=buffer to stdout
+ * up to position(included) in colour defined by paint.
+ */ 
+static void
+out_buf_p(int *buffer, int position, char paint);
+
+/**
+ * This function, print_buf_def_color, helps out_buf_p to print buffer 
+ * in defined color.
+ */ 
+static void
+print_buf_def_color(int *buffer, int position, char *paint);
+
+/**
+ * This function, set_shift_token_pos_ret_buf, is used for decomposition in token functions. 
+ * It returns buffer, and gives variables its values: token=val_token; shf=val_sft; pos=val_pos;
+  */ 
+static int*
+set_shift_token_pos_ret_buf(
+        int *buf,
+        char *token,
+        int *sft,
+        int *pos,
+        char val_token,
+        int val_sft,
+        int val_pos);
+
+/**
+ * This function, equal_sets, allows you to compare two arrays=buf=set up to index=position.
+ * Output parameters:
+ *     - function returns 1 if sets are equal;
+ *     - function returns 0 if sets are not equal;
+ */
+static int
+equal_sets(int *buffer, int pos_buf_set, char *set);
+
+/**
+ * This function, is_key, allows you realize whether buffer=array is a key token in C.
+ * Output parameters:
+ *     - function returns 1 if buffer is equal to key token;
+ *     - function returns 0 if buffer is not equal key token;
+ * Important: this function is not supposed to be used out of "analyzer" function.
+ */ 
+static int
+is_key(int *buffer, int position);
+
+/**
+ * This function, check_give_memory, is used to give memory and check special 
+ * conditions of that.
+ * Input parameters:
+ *     - buffer is an array we can broaden;
+ *     - position is a index that notices about end of buffer;
+ *     - paint is a string presenting color;
+ * Output parameters:
+ *     - function returns NULL if it could not give memory;
+ *     - function returns number != 0 if buffer was broaden up to 2 times;
+ */
+static int*
+check_give_memory(int *buffer, int *size_buf, int position);
+
+/**
+ * This function, inc_pos_read_to_buf, increases position, and reads from opened
+ * file one character.
+ */ 
+void
+inc_pos_read_to_buf(int *buffer, int *position, FILE *fd);
+
+
 
 static void
 paint_return_analyzer(FILE *fd, int *buffer, int position, char paint, int back)
@@ -248,6 +275,60 @@ paint_return_analyzer(FILE *fd, int *buffer, int position, char paint, int back)
     fseek(fd, back, SEEK_CUR);
     return;
 }
+
+static void
+print_buf_def_color(int *buffer, int position, char *paint)
+{
+    static char *no_paint_code = "\033[0m"; // cancel paint
+    printf("%s", paint);
+    fwrite(buffer, sizeof(int), position + 1, stdout);
+    printf("%s", no_paint_code);
+}           
+
+static void
+out_buf_p(int *buffer, int position, char paint)
+{
+    static char *blue_code = "\033[0;34m"; // key words
+    static char *pink_code = "\033[0;35m"; // identificators
+    static char *orange_code = "\033[0;33m"; // const int
+    static char *yellow_code = "\033[1;33m"; // const char
+    static char *green_code = "\033[0;32m"; // const string
+    static char *red_code = "\033[0;31m"; // punctuators
+    static char *brown_code = "\033[0;33m"; // comments
+    
+    switch (paint) {
+    case IDENT_PAINT:
+        print_buf_def_color(buffer, position, pink_code);
+        break;
+   
+    case KEY_PAINT:
+        print_buf_def_color(buffer, position, blue_code);
+        break;  
+    
+    case CONST_INT_PAINT:
+        print_buf_def_color(buffer, position, orange_code);
+        break;
+
+    case CONST_CHAR_PAINT:
+        print_buf_def_color(buffer, position, yellow_code);
+        break;
+
+    case CONST_STR_PAINT:
+        print_buf_def_color(buffer, position, green_code);
+        break;
+
+    case COMMENT_PAINT:
+        print_buf_def_color(buffer, position, brown_code);
+        break;
+
+    case PUNCT_PAINT:
+        print_buf_def_color(buffer, position, red_code);
+        break;
+
+    default:
+        fwrite(buffer, sizeof(int), position + 1, stdout);
+    }
+}   
 
 static int*
 check_give_memory(int *buffer, int *size_buf, int position)
@@ -285,8 +366,6 @@ int_dec_token(
         } else {
             return set_shift_token_pos_ret_buf(buffer, what_token,
                     shift_in_file, position, CONST_INT, SH_ONE_BK, *position + SH_ONE_BK);
-            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, CONST_INT_PAINT, SH_ONE_BK);
-            break;*/
         }
     }        
 }   
@@ -310,8 +389,6 @@ int_oct_token(
         } else {
             return set_shift_token_pos_ret_buf(buffer, what_token,
                     shift_in_file, position, CONST_INT, SH_ONE_BK, *position + SH_ONE_BK);
-            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, CONST_INT_PAINT, SH_ONE_BK);
-            break;*/
         }           
     }
 }   
@@ -334,14 +411,10 @@ char_token(
     if (buffer[*position] == '\'') {
         return set_shift_token_pos_ret_buf(buffer, what_token,
                 shift_in_file, position, NO, 0, *position);
-        /*paint_return_analyzer(fd, buffer, position, NO_PAINT, 0);
-        return 0;*/
     }   
     if (buffer[*position] == EOF) {
         return set_shift_token_pos_ret_buf(buffer, what_token,
                 shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-        return 0;*/
     }
     while (TRUE) {
         if (state_begin) {
@@ -355,8 +428,6 @@ char_token(
         case '\'':
             return set_shift_token_pos_ret_buf(buffer, what_token,
                     shift_in_file, position, CONST_CHAR, 0, *position);
-            /*paint_return_analyzer(fd, buffer, position, CONST_CHAR_PAINT, 0);
-            return 0;*/     
         case '\\':
             while (TRUE) {
                 int flag_x = 0;    
@@ -377,8 +448,6 @@ char_token(
                         if (buffer[*position] == EOF) {
                             return set_shift_token_pos_ret_buf(buffer, what_token,
                                     shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                            return 0;*/
                         }
                         if (isxdigit(buffer[*position])) {
                             counter_hex += 1;
@@ -388,8 +457,6 @@ char_token(
                             case '\'':
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, CONST_CHAR, 0, *position);
-                               /* paint_return_analyzer(fd, buffer, position, CONST_CHAR_PAINT, 0);
-                               return 0;*/
                             case '\\':
                                 flag_u = 1;
                                 break;
@@ -399,8 +466,6 @@ char_token(
                         } else {
                             return set_shift_token_pos_ret_buf(buffer, what_token,
                                     shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                            return 0;*/
                         }
                         break;
                 }
@@ -413,8 +478,6 @@ char_token(
                     if (buffer[*position] == EOF) {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                        return 0;*/
                     }
                     if (isxdigit(buffer[*position])) {
                         while (TRUE) {
@@ -426,16 +489,12 @@ char_token(
                             case '\'': 
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, CONST_CHAR, 0, *position); 
-                                /*paint_return_analyzer(fd, buffer, position, CONST_CHAR_PAINT, 0);
-                                return 0;*/
                             case '\\':
                                 flag_x = 1;
                                 break;
                             case EOF:
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0); 
-                                return 0;*/
                             default:
                                 if (isxdigit(buffer[*position])) {
                                     continue;
@@ -447,15 +506,11 @@ char_token(
                     } else {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                        return 0;*/
                     }
                     break;
                 case EOF:
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                    /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                    return 0;*/    
                 default:
                     if (isdigit(buffer[*position]) && buffer[*position] != '9' && buffer[*position] != '8') {
                         int flag = 0;   
@@ -468,16 +523,12 @@ char_token(
                             case '\'':
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, CONST_CHAR, 0, *position);
-                                /*paint_return_analyzer(fd, buffer, position, CONST_CHAR_PAINT, 0);
-                                return 0;*/
                             case '\\':
                                 flag = 1;
                                 break;  
                             case EOF:
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, NO, 0, *position + SH_ONE_BK); 
-                                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                                return 0;*/     
                             default:
                                 if (isdigit(buffer[*position]) && buffer[*position] != '9' && buffer[*position] != '8') {
                                     continue;   
@@ -495,8 +546,6 @@ char_token(
                     } else {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                        return 0;*/
                     }                               
                     
                 }
@@ -510,8 +559,6 @@ char_token(
             if (buffer[*position] == EOF) {
                 return set_shift_token_pos_ret_buf(buffer, what_token,
                         shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                return 0;*/   
             }  
             continue;  
         }
@@ -537,8 +584,6 @@ string_token(
         case '\"':
             return set_shift_token_pos_ret_buf(buffer, what_token,
                     shift_in_file, position, CONST_STR, 0, *position); 
-            /*paint_return_analyzer(fd, buffer, position, CONST_STR_PAINT, 0);
-            return 0;*/     
         case '\\':
             while (TRUE) {
                 int flag_x = 0;    
@@ -559,8 +604,6 @@ string_token(
                         if (buffer[*position] == EOF) {
                             return set_shift_token_pos_ret_buf(buffer, what_token,
                                     shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                            return 0;*/
                         }
                         if (isxdigit(buffer[*position])) {
                             counter_hex += 1;
@@ -570,8 +613,6 @@ string_token(
                             case '\"':
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, CONST_STR, 0, *position);
-                                /*paint_return_analyzer(fd, buffer, position, CONST_STR_PAINT, 0);
-                                return 0;*/
                             case '\\':
                                 flag_u = 1;
                                 break;
@@ -581,8 +622,6 @@ string_token(
                         } else {
                             return set_shift_token_pos_ret_buf(buffer, what_token,
                                     shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                            return 0;*/
                         }
                         break;
                     }
@@ -595,8 +634,6 @@ string_token(
                     if (buffer[*position] == EOF) {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                        return 0;*/
                     }
                     if (isxdigit(buffer[*position])) {
                         while (TRUE) {
@@ -608,16 +645,12 @@ string_token(
                             case '\"': 
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, CONST_STR, 0, *position);
-                                /*paint_return_analyzer(fd, buffer, position, CONST_STR_PAINT, 0);
-                                return 0;*/
                             case '\\':
                                 flag_x = 1;
                                 break;
                             case EOF:
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0); 
-                                return 0;*/
                             default:
                                 if (isxdigit(buffer[*position])) {
                                     continue;
@@ -629,15 +662,11 @@ string_token(
                     } else {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK); 
-                        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                        return 0;*/
                     }
                     break;
                 case EOF:
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                    /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                    return 0;*/    
                 default:
                     if (isdigit(buffer[*position]) && buffer[*position] != '9' && buffer[*position] != '8') {
                         int flag = 0;   
@@ -650,16 +679,12 @@ string_token(
                             case '\"':
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, CONST_STR, 0, *position); 
-                                /*paint_return_analyzer(fd, buffer, position, CONST_STR_PAINT, 0);
-                                return 0;*/
                             case '\\':
                                 flag = 1;
                                 break;  
                             case EOF:
                                 return set_shift_token_pos_ret_buf(buffer, what_token,
                                         shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                                return 0;*/     
                             default:
                                 if (isdigit(buffer[*position]) && buffer[*position] != '9' && buffer[*position] != '8') {
                                     continue;   
@@ -677,8 +702,6 @@ string_token(
                     } else {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                        /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                        return 0;*/
                     }                               
 
                 }
@@ -692,8 +715,6 @@ string_token(
             if (buffer[*position] == EOF) {
                 return set_shift_token_pos_ret_buf(buffer, what_token,
                         shift_in_file, position, NO, 0, *position + SH_ONE_BK);
-                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                return 0;*/   
             }     
             continue;    
         }    
@@ -818,27 +839,19 @@ ident_token(
                             break;
                         }       
                         return set_shift_token_pos_ret_buf(buffer, what_token,
-                                shift_in_file, position, IDENT, 0, *position);
-                        /*paint_return_analyzer(fd, buffer, *position , IDENT_PAINT, 0);
-                        return 0;*/ 
+                                shift_in_file, position, IDENT, 0, *position + SH_ONE_BK);
                     } else {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                        /*paint_return_analyzer(fd, buffer, *position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                        return 0;*/
                     }
                 }
             } else {
                 if (flag_sev_ucn) {
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, IDENT, SH_TWO_BK, *position + SH_TWO_BK);
-                   /* paint_return_analyzer(fd, buffer, *position + SH_TWO_BK, IDENT_PAINT, SH_TWO_BK);
-                    return 0;*/ 
                 }    
                 return set_shift_token_pos_ret_buf(buffer, what_token,
                         shift_in_file, position, NO, SH_ONE_BK, *position + SH_ONE_BK);
-                /*paint_return_analyzer(fd, buffer, *position + SH_ONE_BK, NO_PAINT, SH_ONE_BK);
-                return 0;*/
             }
             break;
         default:
@@ -851,18 +864,12 @@ ident_token(
                 if (is_key(buffer, *position)) {
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, KEY, SH_ONE_BK, *position);
-                    /*paint_return_analyzer(fd, buffer, *position, KEY_PAINT, SH_ONE_BK);
-                    return 0;*/
                 } else if (buffer[*position - SH_ONE_BK] == EOF) {
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, IDENT, 0, *position);
-                    /*paint_return_analyzer(fd, buffer, *position, IDENT_PAINT, 0);
-                    return 0;*/
                 } else {        
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, IDENT, SH_ONE_BK, *position); 
-                    /*paint_return_analyzer(fd, buffer, *position, IDENT_PAINT, SH_ONE_BK);
-                    return 0;*/
                 }    
             }   
         }
@@ -887,15 +894,11 @@ comment_new_token(
             if (buffer[*position] == EOF) {
                 return set_shift_token_pos_ret_buf(buffer, what_token,
                         shift_in_file, position, NO, 0, *position + SH_ONE_BK); 
-                /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, NO_PAINT, 0);
-                return 0;*/
             }   
             continue;
         } else {
             return set_shift_token_pos_ret_buf(buffer, what_token,
                     shift_in_file, position, COMMENT, SH_ONE_BK, *position + SH_ONE_BK); 
-            /*paint_return_analyzer(fd, buffer, position + SH_ONE_BK, COMMENT_PAINT, SH_ONE_BK);
-            break;*/   
         }
     }
 }   
@@ -918,8 +921,6 @@ comment_old_token(
             if (buffer[*position] == EOF) {
                 return set_shift_token_pos_ret_buf(buffer, what_token,
                         shift_in_file, position, NO, *position * SH_ONE_BK, SH_ONE_BK); 
-                /*paint_return_analyzer(fd, buffer, SH_ONE_BK, NO_PAINT, SH_ONE_BK * position);
-                return 1;*/
             }   
             continue;
         } else {
@@ -935,78 +936,264 @@ comment_old_token(
                     if (buffer[*position] == EOF) {
                         return set_shift_token_pos_ret_buf(buffer, what_token,
                                 shift_in_file, position, NO, *position * SH_ONE_BK, SH_ONE_BK); 
-                        /*paint_return_analyzer(fd, buffer, SH_ONE_BK, NO_PAINT, SH_ONE_BK * position);
-                        return 1;*/
                     }           
                     break;
                 } else {
                     return set_shift_token_pos_ret_buf(buffer, what_token,
                             shift_in_file, position, COMMENT, 0, *position); 
-                    /*paint_return_analyzer(fd, buffer, position, COMMENT_PAINT, 0);
-                    return 0;*/
                 }
             }
             continue;
         }             
     }
-}   
+}
 
 static void
-print_buf_def_color(int *buffer, int position, char *paint)
+inc_token_free_buf_file_back(FILE *fd, int *buffer, char token, int back)
 {
-    static char *no_paint_code = "\033[0m"; // cancel paint
-    printf("%s", paint);
-    fwrite(buffer, sizeof(int), position + 1, stdout);
-    printf("%s", no_paint_code);
-}           
-
-static void
-out_buf_p(int *buffer, int position, char paint)
-{
-    static char *blue_code = "\033[0;34m"; // key words
-    static char *pink_code = "\033[0;35m"; // identificators
-    static char *orange_code = "\033[0;33m"; // const int
-    static char *yellow_code = "\033[1;33m"; // const char
-    static char *green_code = "\033[0;32m"; // const string
-    static char *red_code = "\033[0;31m"; // punctuators
-    static char *brown_code = "\033[0;33m"; // comments
-    
-    switch (paint) {
-    case IDENT_PAINT:
-        print_buf_def_color(buffer, position, pink_code);
+    switch (token) {
+    case NO:
+        strange_tok++;
         break;
-   
-    case KEY_PAINT:
-        print_buf_def_color(buffer, position, blue_code);
-        break;  
-    
-    case CONST_INT_PAINT:
-        print_buf_def_color(buffer, position, orange_code);
+    case CONST_INT:
+        int_tok++;
         break;
-
-    case CONST_CHAR_PAINT:
-        print_buf_def_color(buffer, position, yellow_code);
+    case KEY:
+        key_tok++;
         break;
-
-    case CONST_STR_PAINT:
-        print_buf_def_color(buffer, position, green_code);
+    case CONST_CHAR:
+        char_tok++;
         break;
-
-    case COMMENT_PAINT:
-        print_buf_def_color(buffer, position, brown_code);
+    case CONST_STR:
+        str_tok++;
         break;
-
-    case PUNCT_PAINT:
-        print_buf_def_color(buffer, position, red_code);
+    case IDENT:
+        ident_tok++;
         break;
-
-    default:
-        fwrite(buffer, sizeof(int), position + 1, stdout);
+    case COMMENT:
+        comment_tok++;
+        break;
+    case PUNCT:
+        punct_tok++;
+        break;
     }
+    free(buffer);
+    fseek(fd, back, SEEK_CUR);
+    return;
+}
+
+static void
+print_stat(void)
+{
+    printf("\nSTATISTICS ON FILE:\n");
+    printf("\nstrange_tok = %ld", strange_tok);
+    printf("\nint_tok = %ld", int_tok);
+    printf("\nkey_tok = %ld", key_tok);
+    printf("\nchar_tok = %ld", char_tok);
+    printf("\nstr_tok = %ld", str_tok);
+    printf("\nident_tok = %ld", ident_tok);
+    printf("\ncomment_tok = %ld", comment_tok);
+    printf("\npunct_tok = %ld\n", punct_tok);
+}
+
+void
+give_statistics(FILE *fd)
+{   
+    int init = 0;
+    while ((init = fgetc(fd)) != EOF) {
+        int *buf = malloc(BUF_INIT * sizeof(*buf));
+        *buf = init;
+        int position = 0;
+        char what_token = '!';
+        int shift_in_file = 0;
+        int size = BUF_INIT;
+        if (*buf == 'u') {  
+            init = fgetc(fd);
+            position += 1;
+            if (init == EOF) {
+                inc_token_free_buf_file_back(fd, buf, IDENT, 0);
+                continue;
+            }
+            buf[1] = init;
+            if (buf[1] == '8') {
+                position += 1;    
+                init = fgetc(fd);
+                if (init == EOF) {
+                    inc_token_free_buf_file_back(fd, buf, IDENT, 0);
+                    continue;
+                }   
+                buf[2] = init;
+                if (isalpha(buf[2]) || isdigit(buf[2]) || buf[2] == '_' || buf[2] == '\\') {
+                    if ((buf = ident_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                        perror("TOO LONG TOKEN!");
+                        return;
+                    }
+                    inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                    continue;       
+                }
+                if (buf[2] == '\"') {
+                    if ((buf = string_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                        perror("TOO LONG TOKEN!");
+                        return;
+                    }
+                    inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                    continue;
+                }
+                inc_token_free_buf_file_back(fd, buf, IDENT, SH_ONE_BK);
+                continue;   
+            }      
+            if (isalpha(buf[1]) || isdigit(buf[1]) || buf[1] == '\\' || buf[1] == '_') {
+                if ((buf = ident_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                    perror("TOO LONG TOKEN!");
+                    return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }
+            if (buf[1] == '\'') {
+                if ((buf = char_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                        perror("TOO LONG TOKEN!");
+                        return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }
+            if (buf[1] == '\"') {
+                if ((buf = string_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                        perror("TOO LONG TOKEN!");
+                        return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }
+            inc_token_free_buf_file_back(fd, buf, IDENT, SH_ONE_BK);
+            continue;
+
+        }           
+        if (memchr(set_id_ch_str, *buf, SIZE_SET_ID_CH_STR) != NULL) {
+            init = fgetc(fd);
+            position += 1;
+            if (init == EOF) {
+                inc_token_free_buf_file_back(fd, buf, IDENT, 0);
+                continue;
+            }
+            buf[1] = init;
+            if (isalpha(buf[1]) || isdigit(buf[1]) || buf[1] == '_' || buf[1] == '\\') {
+                if ((buf = ident_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                    perror("TOO LONG TOKEN!");
+                    return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }
+            if (buf[1] == '\'') {
+                if ((buf = char_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                    perror("TOO LONG TOKEN!");
+                    return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }
+            if (buf[1] == '\"') {
+                if ((buf = string_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                    perror("TOO LONG TOKEN!");
+                    return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }
+            inc_token_free_buf_file_back(fd, buf, IDENT, SH_ONE_BK);
+            continue;
+        }
+        if (isalpha(*buf) || *buf == '_' || *buf == '\\') {
+            if ((buf = ident_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                perror("TOO LONG TOKEN!");
+                return;
+            }
+            inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+            continue;
+        }
+        if (isdigit(*buf) && (*buf != '0')) {
+            if ((buf = int_dec_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                perror("TOO LONG TOKEN!");
+                return;
+            }
+            inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+            continue;
+        }
+        if (*buf == '0') {
+            if ((buf = int_oct_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                perror("TOO LONG TOKEN!");
+                return;
+            }
+            inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+            continue;
+        }
+        if (*buf == '\'') {
+            if ((buf = char_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                perror("TOO LONG TOKEN!");
+                return;
+            }
+            inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+            continue;
+        }
+        if (*buf == '\"') {
+            if ((buf = string_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                perror("TOO LONG TOKEN!");
+                return;
+            }
+            inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+            continue;
+        }
+        if (*buf == '/') {
+            init = fgetc(fd);
+            position += 1;
+            if (init == EOF) {
+                inc_token_free_buf_file_back(fd, buf, PUNCT, 0);
+                continue;
+            }
+            buf[1] = init;
+            if (buf[1] == '/') {
+                if ((buf = comment_new_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                    perror("TOO LONG TOKEN!");
+                    return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                continue;
+            }  
+            if (buf[1] == '*') {
+                if ((buf = comment_old_token(buf, size, &position, fd, &what_token, &shift_in_file)) == NULL) {
+                    perror("TOO LONG TOKEN!");
+                    return;
+                }
+                inc_token_free_buf_file_back(fd, buf, what_token, shift_in_file);
+                if (position == SH_ONE_BK) {
+                    buf = malloc(BUF_INIT * sizeof(*buf));
+                    *buf = fgetc(fd);
+                    position = 0;
+                    size = BUF_INIT;
+                    inc_token_free_buf_file_back(fd, buf, PUNCT, 0);
+                    continue;
+                }
+                continue;
+            } 
+            inc_token_free_buf_file_back(fd, buf, PUNCT, SH_ONE_BK);
+            continue;
+
+        }
+        if (memchr(punctuators, *buf, SIZE_SET_PUNCT) != NULL) {
+            inc_token_free_buf_file_back(fd, buf, PUNCT, 0);
+            continue;
+        }
+        strange_tok++; 
+        free(buf);
+    }   
+    print_stat();   
+    return;
 }   
 
 void
-analyzer(FILE *fd)
+painter(FILE *fd)
 {
     int init = 0;
     while ((init = fgetc(fd)) != EOF) {
@@ -1038,11 +1225,6 @@ analyzer(FILE *fd)
                         return;
                     }
                     paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                    /*int state = ident_token(buf, size, position, fd);
-                    if (state == -1) {
-                        perror("TOO LONG TOKEN!");
-                        return;
-                    }*/
                     continue;       
                 }
                 if (buf[2] == '\"') {
@@ -1051,11 +1233,6 @@ analyzer(FILE *fd)
                         return;
                     }
                     paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                    /*int state = string_token(buf, size, position, fd);
-                    if (state == -1) {
-                        perror("TOO LONG TOKEN!");
-                        return;
-                    }*/
                     continue;
                 }
                 paint_return_analyzer(fd, buf, position + SH_ONE_BK, IDENT_PAINT, SH_ONE_BK);
@@ -1067,11 +1244,6 @@ analyzer(FILE *fd)
                     return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = ident_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;
-                }*/ 
                 continue;
             }
             if (buf[1] == '\'') {
@@ -1080,11 +1252,6 @@ analyzer(FILE *fd)
                         return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = char_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;
-                }*/
                 continue;
             }
             if (buf[1] == '\"') {
@@ -1093,11 +1260,6 @@ analyzer(FILE *fd)
                         return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = string_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;         
-                }*/
                 continue;
             }
             paint_return_analyzer(fd, buf, position + SH_ONE_BK, IDENT_PAINT, SH_ONE_BK);     
@@ -1118,11 +1280,6 @@ analyzer(FILE *fd)
                     return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = ident_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;
-                }*/
                 continue;
             }
             if (buf[1] == '\'') {
@@ -1131,11 +1288,6 @@ analyzer(FILE *fd)
                     return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = char_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;
-                }*/
                 continue;
             }
             if (buf[1] == '\"') {
@@ -1144,11 +1296,6 @@ analyzer(FILE *fd)
                     return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = string_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN");
-                    return;
-                }*/
                 continue;
             }
             paint_return_analyzer(fd, buf, position + SH_ONE_BK, IDENT_PAINT, SH_ONE_BK);
@@ -1160,11 +1307,6 @@ analyzer(FILE *fd)
                 return;
             }
             paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-            /*int state = ident_token(buf, size, position, fd);
-            if (state == -1) {
-                perror("TOO LONG TOKEN!");
-                return;
-            }*/
             continue;
         }
         if (isdigit(*buf) && (*buf != '0')) {
@@ -1173,11 +1315,6 @@ analyzer(FILE *fd)
                 return;
             }
             paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-            /*int state = int_dec_token(buf, size, position, fd);
-            if (state == -1) {
-                perror("TOO LONG TOKEN!");
-                return;
-            } */  
             continue;
         }
         if (*buf == '0') {
@@ -1186,11 +1323,6 @@ analyzer(FILE *fd)
                 return;
             }
             paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-            /*int state = int_oct_token(buf, size, position, fd);
-            if (state == -1) {
-                perror("TOO LONG TOKEN!");
-                return;
-            }*/
             continue;
         }
         if (*buf == '\'') {
@@ -1199,11 +1331,6 @@ analyzer(FILE *fd)
                 return;
             }
             paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-            /*int state = char_token(buf, size, position, fd);
-            if (state == -1) {
-                perror("TOO LONG TOKEN!");
-                return;
-            }*/
             continue;
         }
         if (*buf == '\"') {
@@ -1212,11 +1339,6 @@ analyzer(FILE *fd)
                 return;
             }
             paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-            /*int state = string_token(buf, size, position, fd);
-            if (state == -1) {
-                perror("TOO LONG TOKEN!");
-                return;
-            }*/
             continue;
         }
         if (*buf == '/') {
@@ -1233,11 +1355,6 @@ analyzer(FILE *fd)
                     return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = comment_new_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;
-                }*/
                 continue;
             }  
             if (buf[1] == '*') {
@@ -1246,11 +1363,6 @@ analyzer(FILE *fd)
                     return;
                 }
                 paint_return_analyzer(fd, buf, position, what_token, shift_in_file);
-                /*int state = comment_old_token(buf, size, position, fd);
-                if (state == -1) {
-                    perror("TOO LONG TOKEN!");
-                    return;
-                }*/
                 if (position == SH_ONE_BK) {
                     buf = malloc(BUF_INIT * sizeof(*buf));
                     *buf = fgetc(fd);
@@ -1273,4 +1385,4 @@ analyzer(FILE *fd)
         free(buf);
     }      
     return;
-}   
+} 
