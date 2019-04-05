@@ -1,4 +1,6 @@
-#include "analyzer.h"
+#include "paint_tokens_in_file.h"
+#include "give_stats_tokens_in_file.h"
+#include <stdio.h>
 
 int main(int argc, char ** argv)
 {
@@ -12,9 +14,9 @@ int main(int argc, char ** argv)
         return 1;
     }
     if (*argv[2] == 'p') {
-        painter(fp);
+        print_colored_tokens(fp);
     } else if (*argv[2] == 's') {
-        give_statistics(fp);
+        give_number_tokens(fp);
     } else {
         fclose(fp);
         fprintf(stderr, "Wrong mode!\n");

@@ -20,7 +20,7 @@ size_vec(struct Dynamic_Vec *vec)
 }    
 
 struct Dynamic_Vec * 
-initialize_vec(int *error)
+initialize_vec(void)
 {
     struct Dynamic_Vec *vec = malloc(sizeof(*vec));
     if (vec == NULL) {
@@ -86,12 +86,12 @@ get_value_vec(struct Dynamic_Vec *vec, int index, int *data)
 }    
 
 int
-print_dyn_vec(struct Dynamic_Vec *vec, int index_begin, int index_end)
+print_dyn_vec_digit(struct Dynamic_Vec *vec, int index_begin, int index_end)
 {
     if (vec == NULL) {
         return -1;
     }
-    if (index_begin >= index_end) {
+    if (index_begin > index_end) {
         return -1;
     }
     if (index_begin < 0) {
@@ -103,11 +103,27 @@ print_dyn_vec(struct Dynamic_Vec *vec, int index_begin, int index_end)
     for (int i = index_begin; i <= index_end; i++) {
         printf("%d ", vec->container[i]);
     }
-    /*fwrite(vec->container + index_begin, sizeof(*(vec->container)), index_end - index_begin + 1, stdout);*/
     return 0;
 }    
 
-
+int
+print_dyn_vec_text(struct Dynamic_Vec *vec, int index_begin, int index_end)
+{
+    if (vec == NULL) {
+        return -1;
+    }
+    if (index_begin > index_end) {
+        return -1;
+    }
+    if (index_begin < 0) {
+        return -1;
+    }
+    if (index_end > vec->size) {
+        return -1;
+    }
+    fwrite(vec->container + index_begin, sizeof(*(vec->container)), index_end - index_begin + 1, stdout);
+    return 0;
+}
 
 
 

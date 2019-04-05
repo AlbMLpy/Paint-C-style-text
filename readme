@@ -19,3 +19,4 @@ And give statistics on requirement(s);
 example:
 ./analyzer test p   - if you want to paint
 ./analyzer test s   - if you want statistics
+

@@ -1,9 +1,6 @@
-all : analyzer
-analyzer : analyzer.o main.o
-	gcc main.o analyzer.o -o analyzer
-main.o : analyzer.c analyzer.h main.c
-	gcc -c -Wall -Werror -g  main.c
-analyzer.o : analyzer.c analyzer.h
-	gcc -c -Wall -Werror -g analyzer.c
-clean:
-	rm -f *.o
+all : 
+	gcc dynamic_vec.c dyn_vec_token.c define_token.c painter_container.c paint_tokens_in_file.c stat_on_num.c give_stats_tokens_in_file.c main.c -o analyzer
+cov_debug :
+	gcc -g --coverage dynamic_vec.c dyn_vec_token.c define_token.c painter_container.c paint_tokens_in_file.c stat_on_num.c give_stats_tokens_in_file.c main.c -o analyzer
+clean :
+	rm -f *.gc*
