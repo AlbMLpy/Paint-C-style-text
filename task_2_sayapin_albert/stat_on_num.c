@@ -1,6 +1,12 @@
 #include "stat_on_num.h"
 #include <stdlib.h>
 
+struct Stats_On_Num {
+    int *counter_var;
+    char *type_var;
+    int size;
+};
+
 struct Stats_On_Num *
 init_stats(char type_var, int count)
 {
@@ -74,13 +80,13 @@ get_var_count(struct Stats_On_Num *stat, char id_var)
 }
 
 int
-inc_var_count(struct Stats_On_Num *stat, struct Dynamic_Vec_Token *vec)
+inc_var_count(struct Stats_On_Num *stat, char id_var)
 {
     if (stat == NULL) {
         return -1;
     }
     for (int i = 0; i < stat->size; i++) {
-        if (stat->type_var[i] == get_type_token(vec)) {
+        if (stat->type_var[i] == id_var) {
             stat->counter_var[i] += 1;
             return 0;
         }

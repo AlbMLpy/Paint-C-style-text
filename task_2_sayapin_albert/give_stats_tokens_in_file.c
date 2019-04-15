@@ -1,4 +1,6 @@
 #include "give_stats_tokens_in_file.h"
+#include "stat_on_num.h"
+#include "define_token.h"
 #include <stdio.h>
 
 /**
@@ -7,7 +9,7 @@
  * Description:
  *    This function initialize token stats object with type defined in define_token.h ;
  */
-struct Stats_On_Num *
+static struct Stats_On_Num *
 init_stats_tokens(void);
 
 /**
@@ -16,17 +18,45 @@ init_stats_tokens(void);
  * Description:
  *    This function prints token stats with types difined in define_token.h;
  */
-void
+static void
 print_stat(struct Stats_On_Num *stat);
 
-struct Stats_On_Num *
+void
+give_number_tokens(FILE *fd)
+{
+    struct Dynamic_Vec_Token *vec = initialize_vec_token();
+    if (vec == NULL) {
+        fprintf(stderr, "%s\n", "Memory error!");
+        return;
+    }
+    struct Stats_On_Num *stat = init_stats_tokens();
+    if (stat == NULL) {
+        fprintf(stderr, "%s\n", "Memory error!");
+        return;
+    }
+    char type_token = get_type_token(vec);
+    while (type_token != EOF_RET) {
+        inc_var_count(stat, type_token);
+        set_end_token(vec, 0);
+        if (give_token(vec, fd) == NULL) {
+            fprintf(stderr, "%s\n", "Memory error!");
+            return;
+        }
+        type_token = get_type_token(vec);
+    }
+    print_stat(stat);
+    finalize_vec_token(vec);
+    finalize_stats(stat);
+    return;
+}
+
+static struct Stats_On_Num *
 init_stats_tokens(void)
 {
     struct Stats_On_Num *stat = init_stats(IDENT, 0);
     if (stat == NULL) {
         return NULL;
     }
-    stat->inc_var_count = inc_var_count;
     if (add_var(stat, CONST_CHAR, 0) == -1) {
         return NULL;
     }
@@ -51,7 +81,7 @@ init_stats_tokens(void)
     return stat;  
 }
 
-void
+static void
 print_stat(struct Stats_On_Num * stat)
 {
     printf("\nSTATISTICS ON FILE:\n");

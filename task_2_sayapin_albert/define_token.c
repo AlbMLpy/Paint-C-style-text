@@ -115,19 +115,6 @@ comment_old_token(struct Dynamic_Vec_Token *vec, FILE *fd);
 /**
  * Input parameters:
  *    - "vec" is a pointer on previously initialized object of type below;
- *    - "fd" is a pointer on previously opened file;
- * Output parameters:
- *    - pointer on object typed below;
- * Description:
- *    This function returns pointer object if there are no problems with memory, and
- *    NULL if the memory ran out: and set type of token: PUNCT if token is regular, NO in contrast;
- */
-static struct Dynamic_Vec_Token *
-punct_token(struct Dynamic_Vec_Token *vec, FILE *fd);
-
-/**
- * Input parameters:
- *    - "vec" is a pointer on previously initialized object of type below;
  *    - "set" is a pointer on set that is of the same size as vec;
  * Output parameters:
  *    - returns 1 if sets are equal;
@@ -520,24 +507,6 @@ comment_old_token(struct Dynamic_Vec_Token *vec, FILE *fd)
     }
 }
 
-static struct Dynamic_Vec_Token *
-punct_token(struct Dynamic_Vec_Token *vec, FILE *fd)
-{
-    int init = 0;
-    while (TRUE) {
-        init = fgetc(fd);
-        if (memchr(punctuators, init, SIZE_SET_PUNCT) != NULL) {
-            if (add_to_token(vec, init) == NULL) {
-                return NULL;
-            }
-        } else {
-            set_type_token(vec, PUNCT);
-            fseek(fd, SH_ONE_BK, SEEK_CUR);
-            return vec;
-        }
-    }
-}
-
 struct Dynamic_Vec_Token *
 give_token(struct Dynamic_Vec_Token *vec, FILE *fd)
 {   
@@ -650,7 +619,8 @@ give_token(struct Dynamic_Vec_Token *vec, FILE *fd)
         return vec;
     }
     if (memchr(punctuators, init, SIZE_SET_PUNCT) != NULL) {
-        return punct_token(vec, fd);
+        set_type_token(vec, PUNCT);
+        return vec;
     }
     set_type_token(vec, NO);
     return vec;

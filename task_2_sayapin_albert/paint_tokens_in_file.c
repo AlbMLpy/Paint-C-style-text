@@ -1,15 +1,47 @@
 #include "paint_tokens_in_file.h"
 #include "painter_container.h"
+#include "define_token.h"
+#include <stdio.h>
 
-int
-paint(Painter *does, struct Dynamic_Vec_Token *vec)
-{
-    does->print_token_in_color(vec);
-    return 0;
-}    
+/**
+ * Input parameters:
+ *    - "vec" is a pointer on previously initializer object of type below;
+ *    - "paint" is a variable depending on type of token;
+ * Description:
+ *    This function prints token in appropriate color to standart output;
+ */
+static void
+print_token_in_color(struct Dynamic_Vec_Token *vec, char paint);
 
 void
-print_token_in_color(struct Dynamic_Vec_Token *vec)
+print_colored_tokens(FILE *fd)
+{
+    struct Dynamic_Vec_Token *vec = initialize_vec_token();
+    if (vec == NULL) {
+        fprintf(stderr, "%s\n", "Memory error!");
+        return;
+    }
+    if (give_token(vec, fd) == NULL) {
+        fprintf(stderr, "%s\n", "Memory error!");
+        return;
+    }
+    char type_token = get_type_token(vec);
+    while (type_token != EOF_RET) {
+        print_token_in_color(vec, type_token);
+        set_end_token(vec, 0);
+        if (give_token(vec, fd) == NULL) {
+            fprintf(stderr, "%s\n", "Memory error!");
+            return;
+        }
+        type_token = get_type_token(vec);
+    }
+    finalize_vec_token(vec);
+    return;
+}    
+
+
+static void
+print_token_in_color(struct Dynamic_Vec_Token *vec, char paint)
 {
     static char *blue_code = "\033[0;34m"; // key words
     static char *pink_code = "\033[0;35m"; // identificators
@@ -19,7 +51,7 @@ print_token_in_color(struct Dynamic_Vec_Token *vec)
     static char *red_code = "\033[0;31m"; // punctuators
     static char *brown_code = "\033[0;33m"; // comments
     
-    switch (get_type_token(vec)) {
+    switch (paint) {
     case IDENT:
         print_cont_in_color(vec, print_token, pink_code);
         break;

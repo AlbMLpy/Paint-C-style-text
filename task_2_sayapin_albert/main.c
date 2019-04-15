@@ -1,6 +1,5 @@
 #include "paint_tokens_in_file.h"
 #include "give_stats_tokens_in_file.h"
-#include "polymorph_act.h"
 #include <stdio.h>
 
 int main(int argc, char ** argv)
@@ -15,25 +14,9 @@ int main(int argc, char ** argv)
         return 1;
     }
     if (*argv[2] == 'p') {
-        
-        Painter painter;
-        painter.paint = paint;
-        painter.print_token_in_color = print_token_in_color;
-
-        polymorph_action_tokens(fp, (Action*) &painter);
-
+        print_colored_tokens(fp);
     } else if (*argv[2] == 's') {
-     
-        Stats_On_Num *stat = init_stats_tokens();
-        if (stat == NULL) {
-            fprintf(stderr, "%s\n", "Memory error!");
-            return 1;
-        }
-        
-        polymorph_action_tokens(fp, (Action*) stat);
-
-        print_stat(stat);
-        finalize_stats(stat);        
+        give_number_tokens(fp);
     } else {
         fclose(fp);
         fprintf(stderr, "Wrong mode!\n");
