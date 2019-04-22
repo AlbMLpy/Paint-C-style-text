@@ -20,15 +20,3 @@ example:
 ./analyzer test p   - if you want to paint
 ./analyzer test s   - if you want statistics
 
-********************************************************************************
-Important:                                                                     *
-                                                                               *
-Added polymorph_act.c/polymorph_act.h files that describe universal            *
-interface to use dynamic polymorphism.                                         *
-                                                                               * 
-Moreover, in give_stats_tokens_in_file.* changed interfaces for                *
-polymorphism and in paint_tokens_in_file.* as well.                            *
-                                                                               *
-All these actions allowed to realize different actions in one common function! *
-                                                                               *
-********************************************************************************

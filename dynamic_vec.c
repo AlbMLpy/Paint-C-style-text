@@ -12,7 +12,7 @@ struct Dynamic_Vec
 };
 
 int
-size_vec(struct Dynamic_Vec *vec)
+Dynamic_Vec_size_vec(Dynamic_Vec *vec)
 {
     if (vec == NULL) {
         return -1;
@@ -20,16 +20,16 @@ size_vec(struct Dynamic_Vec *vec)
     return vec->size;
 }    
 
-struct Dynamic_Vec * 
-initialize_vec(void)
+Dynamic_Vec * 
+Dynamic_Vec_initialize_vec(void)
 {
-    struct Dynamic_Vec *vec = malloc(sizeof(*vec));
+    Dynamic_Vec *vec = malloc(sizeof(*vec));
     if (vec == NULL) {
         return vec;
     }
     vec->container = malloc(sizeof(*(vec->container)) * INIT_SIZE);
     if (vec->container == NULL) {
-        finalize_vec(vec);
+        Dynamic_Vec_finalize_vec(vec);
         return vec;    
     }
     memset(vec->container, 0, sizeof(vec->container[0]) * INIT_SIZE);
@@ -38,7 +38,7 @@ initialize_vec(void)
 }    
 
 void
-finalize_vec(struct Dynamic_Vec *vec)
+Dynamic_Vec_finalize_vec(Dynamic_Vec *vec)
 {
     if (vec != NULL) {
         free(vec->container);
@@ -49,8 +49,8 @@ finalize_vec(struct Dynamic_Vec *vec)
     return;
 }
 
-struct Dynamic_Vec *
-set_value_vec(struct Dynamic_Vec *vec, int index, int data)
+Dynamic_Vec *
+Dynamic_Vec_set_value_vec(Dynamic_Vec *vec, int index, int data)
 {
     if (vec == NULL) {
         return vec;
@@ -62,7 +62,7 @@ set_value_vec(struct Dynamic_Vec *vec, int index, int data)
         vec->size = vec->size * POW_SIZE;
         vec->container = realloc(vec->container, vec->size * sizeof(*(vec->container)));
         if (vec->container == NULL) {
-            finalize_vec(vec);
+            Dynamic_Vec_finalize_vec(vec);
             vec = NULL;
             return vec;
         }
@@ -74,7 +74,7 @@ set_value_vec(struct Dynamic_Vec *vec, int index, int data)
 }    
 
 int 
-get_value_vec(struct Dynamic_Vec *vec, int index, int *data)
+Dynamic_Vec_get_value_vec(Dynamic_Vec *vec, int index, int *data)
 {
     if (vec == NULL) {
         return -1;
@@ -87,7 +87,7 @@ get_value_vec(struct Dynamic_Vec *vec, int index, int *data)
 }    
 
 int
-print_dyn_vec_digit(struct Dynamic_Vec *vec, int index_begin, int index_end)
+Dynamic_Vec_print_dyn_vec_digit(Dynamic_Vec *vec, int index_begin, int index_end)
 {
     if (vec == NULL) {
         return -1;
@@ -108,7 +108,7 @@ print_dyn_vec_digit(struct Dynamic_Vec *vec, int index_begin, int index_end)
 }    
 
 int
-print_dyn_vec_text(struct Dynamic_Vec *vec, int index_begin, int index_end)
+Dynamic_Vec_print_dyn_vec_text(Dynamic_Vec *vec, int index_begin, int index_end)
 {
     if (vec == NULL) {
         return -1;

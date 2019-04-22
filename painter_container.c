@@ -3,8 +3,8 @@
 
 void
 print_cont_in_color(
-        struct Dynamic_Vec_Token *container,
-        int (*printer) (struct Dynamic_Vec_Token *container),
+        Dynamic_Vec_Token *container,
+        int (*printer) (Dynamic_Vec_Token *container),
         char *paint)
 {   
     static char *no_paint_code = "\033[0m"; // cancel paint

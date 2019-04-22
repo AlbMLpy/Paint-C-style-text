@@ -31,8 +31,8 @@ static char simple_escape[] = { '\'', '\"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: CONST_INT if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-int_dec_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+int_dec_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -44,8 +44,8 @@ int_dec_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: CONST_INT if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-int_oct_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+int_oct_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -57,8 +57,8 @@ int_oct_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: CONST_CHAR if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-char_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+char_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -70,8 +70,8 @@ char_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: CONST_STR if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-string_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+string_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -83,8 +83,8 @@ string_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: IDENT if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-ident_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+ident_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -96,8 +96,8 @@ ident_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: COMMENT if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-comment_new_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+comment_new_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -109,8 +109,8 @@ comment_new_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: COMMENT if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-comment_old_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+comment_old_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -122,8 +122,8 @@ comment_old_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function returns pointer object if there are no problems with memory, and
  *    NULL if the memory ran out: and set type of token: PUNCT if token is regular, NO in contrast;
  */
-static struct Dynamic_Vec_Token *
-punct_token(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+punct_token(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -136,7 +136,7 @@ punct_token(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    This function compares two sets of equal size;
  */
 static int
-equal_sets(struct Dynamic_Vec_Token *vec, char *set);
+equal_sets(Dynamic_Vec_Token *vec, char *set);
 
 /**
  * Input parameters:
@@ -148,7 +148,7 @@ equal_sets(struct Dynamic_Vec_Token *vec, char *set);
  *    This function check if input token is a key token;
  */ 
 static int
-is_key(struct Dynamic_Vec_Token *vec);
+is_key(Dynamic_Vec_Token *vec);
 
 /**
  * Input parameters:
@@ -161,8 +161,8 @@ is_key(struct Dynamic_Vec_Token *vec);
  *    NULL if the memory ran out: and set type of token: INIT_TYPE if token is regular, NO in contrast;
  *    It pulls only heximal digits into token else token type=NO;
  */
-static struct Dynamic_Vec_Token *
-hex_only(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+hex_only(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -175,8 +175,8 @@ hex_only(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    NULL if the memory ran out: and set type of token: INIT_TYPE if token is regular, NO in contrast;
  *    It pulls only 0 < x <= 3 octuple digits into token else token type=NO;
  */
-static struct Dynamic_Vec_Token *
-oct_less_eq_3(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+oct_less_eq_3(Dynamic_Vec_Token *vec, FILE *fd);
 
 /**
  * Input parameters:
@@ -189,63 +189,63 @@ oct_less_eq_3(struct Dynamic_Vec_Token *vec, FILE *fd);
  *    NULL if the memory ran out: and set type of token: INIT_TYPE if token is regular, NO in contrast;
  *    It pulls only 4 or 8 heximal digits into token else token type=NO;
  */
-static struct Dynamic_Vec_Token *
-u_4_8_hex(struct Dynamic_Vec_Token *vec, FILE *fd);
+static Dynamic_Vec_Token *
+u_4_8_hex(Dynamic_Vec_Token *vec, FILE *fd);
 
 
-static struct Dynamic_Vec_Token *
-int_dec_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+int_dec_token(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;
     while (TRUE) {       
         init = fgetc(fd);
         if (isdigit(init)) {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
         } else {
-            set_type_token(vec, CONST_INT);
+            Dynamic_Vec_Token_set_type_token(vec, CONST_INT);
             fseek(fd, SH_ONE_BK, SEEK_CUR);   
             return vec;
         }
     }        
 }   
 
-static struct Dynamic_Vec_Token *
-int_oct_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+int_oct_token(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (isdigit(init) && init != '9' && init != '8') {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
         } else {
-            set_type_token(vec, CONST_INT);
+            Dynamic_Vec_Token_set_type_token(vec, CONST_INT);
             fseek(fd, SH_ONE_BK, SEEK_CUR);
             return vec;
         }           
     }
 }   
 
-static struct Dynamic_Vec_Token *
-char_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+char_token(Dynamic_Vec_Token *vec, FILE *fd)
 {   
     int init = 0;
     int state_begin = 0;    
     init = fgetc(fd);
     if (init == '\'' || init == '\n') {
-        if (add_to_token(vec, init) == NULL) {
+        if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
             return NULL;
         }
-        set_type_token(vec, NO);
+        Dynamic_Vec_Token_set_type_token(vec, NO);
         return vec;
     }   
     if (init == EOF) {
-        set_type_token(vec, NO);
+        Dynamic_Vec_Token_set_type_token(vec, NO);
         return vec;
     }
     while (TRUE) {
@@ -255,13 +255,13 @@ char_token(struct Dynamic_Vec_Token *vec, FILE *fd)
         state_begin++;
         switch (init) {
         case '\'':
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
-            set_type_token(vec, CONST_CHAR);
+            Dynamic_Vec_Token_set_type_token(vec, CONST_CHAR);
             return vec;
         case '\\':
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             init = fgetc(fd);
@@ -272,18 +272,18 @@ char_token(struct Dynamic_Vec_Token *vec, FILE *fd)
                 if (u_4_8_hex(vec, fd) == NULL) {
                     return NULL;
                 }
-                if (get_type_token(vec) != INIT_TYPE) {
+                if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                     return vec;
                 }
                 continue;
             case 'x':
-                if (add_to_token(vec, init) == NULL) {
+                if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                     return NULL;
                 } 
                 if (hex_only(vec, fd) == NULL) {
                     return NULL;
                 }
-                if (get_type_token(vec) != INIT_TYPE) {
+                if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                     return vec;
                 }
                 continue;
@@ -293,34 +293,34 @@ char_token(struct Dynamic_Vec_Token *vec, FILE *fd)
                     if (oct_less_eq_3(vec, fd) == NULL) {
                         return NULL;
                     }
-                    if (get_type_token(vec) != INIT_TYPE) {
+                    if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                         return vec;
                     }
                     continue;
                 } else if (memchr(simple_escape, init, SIZE_SET_SIM_ESC) != NULL) {
-                    if (add_to_token(vec, init) == NULL) {
+                    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                         return NULL;
                     }  
                     continue;
                 } else {
                     fseek(fd, SH_ONE_BK, SEEK_CUR);
-                    set_type_token(vec, NO);
+                    Dynamic_Vec_Token_set_type_token(vec, NO);
                     return vec;
                 }
             }
         default:
             if (init == EOF) {
-                set_type_token(vec, NO);
+                Dynamic_Vec_Token_set_type_token(vec, NO);
                 return vec;
             }
             if (init == '\n') {
-                if (add_to_token(vec, init) == NULL) {
+                if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                     return NULL;
                 }
-                set_type_token(vec, NO);
+                Dynamic_Vec_Token_set_type_token(vec, NO);
                 return vec;
             }  
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;  
@@ -328,21 +328,21 @@ char_token(struct Dynamic_Vec_Token *vec, FILE *fd)
     }
 }       
 
-static struct Dynamic_Vec_Token *
-string_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+string_token(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;    
     while (TRUE) {
         init = fgetc(fd);
         switch (init) {
         case '\"':
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
-            set_type_token(vec, CONST_STR);
+            Dynamic_Vec_Token_set_type_token(vec, CONST_STR);
             return vec;
         case '\\':
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             init = fgetc(fd);
@@ -353,18 +353,18 @@ string_token(struct Dynamic_Vec_Token *vec, FILE *fd)
                 if (u_4_8_hex(vec, fd) == NULL) {
                     return NULL;
                 }
-                if (get_type_token(vec) != INIT_TYPE) {
+                if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                     return vec;
                 }
                 continue;
             case 'x':
-                if (add_to_token(vec, init) == NULL) {
+                if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                     return NULL;
                 } 
                 if (hex_only(vec, fd) == NULL) {
                     return NULL;
                 }
-                if (get_type_token(vec) != INIT_TYPE) {
+                if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                     return vec;
                 }
                 continue;
@@ -374,33 +374,33 @@ string_token(struct Dynamic_Vec_Token *vec, FILE *fd)
                     if (oct_less_eq_3(vec, fd) == NULL) {
                         return NULL;
                     }
-                    if (get_type_token(vec) != INIT_TYPE) {
+                    if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                         return vec;
                     }
                     continue;
                 } else if (memchr(simple_escape, init, SIZE_SET_SIM_ESC) != NULL) {
-                    if (add_to_token(vec, init) == NULL) {
+                    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                         return NULL;
                     }  
                     continue;
                 } else {
-                    set_type_token(vec, NO);
+                    Dynamic_Vec_Token_set_type_token(vec, NO);
                     return vec;
                 }
             }
         default:
             if (init == EOF) {
-                set_type_token(vec, NO);
+                Dynamic_Vec_Token_set_type_token(vec, NO);
                 return vec;
             }
             if (init == '\n') {
-                if (add_to_token(vec, init) == NULL) {
+                if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                     return NULL;
                 }
-                set_type_token(vec, NO);
+                Dynamic_Vec_Token_set_type_token(vec, NO);
                 return vec;
             }
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }  
             continue;  
@@ -408,34 +408,34 @@ string_token(struct Dynamic_Vec_Token *vec, FILE *fd)
     }
 }           
 
-static struct Dynamic_Vec_Token *
-ident_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+ident_token(Dynamic_Vec_Token *vec, FILE *fd)
 { 
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         switch (init) {
         case '\\':
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             if (u_4_8_hex(vec, fd) == NULL) {
                 return NULL;
             }
-            if (get_type_token(vec) != INIT_TYPE) {
+            if (Dynamic_Vec_Token_get_type_token(vec) != INIT_TYPE) {
                 return vec;
             }
             break;
         default:
             if (isalpha(init) || isdigit(init) || init == '_') {
-                if (add_to_token(vec, init) == NULL) {
+                if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                     return NULL;
                 }
             } else {   
                 if (is_key(vec)) {
-                    set_type_token(vec, KEY);
+                    Dynamic_Vec_Token_set_type_token(vec, KEY);
                 } else {
-                    set_type_token(vec, IDENT); 
+                    Dynamic_Vec_Token_set_type_token(vec, IDENT); 
                 }  
                 if (init != EOF) {
                     fseek(fd, SH_ONE_BK, SEEK_CUR);
@@ -446,72 +446,72 @@ ident_token(struct Dynamic_Vec_Token *vec, FILE *fd)
     }       
 }
 
-static struct Dynamic_Vec_Token *
-comment_new_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+comment_new_token(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (init != '\n') {
             if (init == EOF) {
-                set_type_token(vec, NO);
+                Dynamic_Vec_Token_set_type_token(vec, NO);
                 return vec;
             }   
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
         } else {
-            if(add_to_token(vec, init) == NULL) {
+            if(Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
-            set_type_token(vec, COMMENT);
+            Dynamic_Vec_Token_set_type_token(vec, COMMENT);
             return vec;
         }
     }
 }   
 
-static struct Dynamic_Vec_Token *
-comment_old_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+comment_old_token(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (init != '*') {
             if (init == EOF) {
-                set_type_token(vec, NO);
+                Dynamic_Vec_Token_set_type_token(vec, NO);
                 return vec;
             }   
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
         } else {
-           if (add_to_token(vec, init) == NULL) {
+           if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             while (TRUE) {
                 init = fgetc(fd);
                 if (init == '*') {
-                    if (add_to_token(vec, init) == NULL) {
+                    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                         return NULL;
                     }
                     continue;
                 }
                 if (init != '/') {
                     if (init == EOF) {
-                        set_type_token(vec, NO);
+                        Dynamic_Vec_Token_set_type_token(vec, NO);
                         return vec;
                     }       
-                    if (add_to_token(vec, init) == NULL) {
+                    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                         return NULL;
                     }    
                     break;
                 } else {
-                    if (add_to_token(vec, init) == NULL) {
+                    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                         return NULL;
                     }
-                    set_type_token(vec, COMMENT);
+                    Dynamic_Vec_Token_set_type_token(vec, COMMENT);
                     return vec;
                 }
             }
@@ -520,149 +520,149 @@ comment_old_token(struct Dynamic_Vec_Token *vec, FILE *fd)
     }
 }
 
-static struct Dynamic_Vec_Token *
-punct_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+punct_token(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (memchr(punctuators, init, SIZE_SET_PUNCT) != NULL) {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
         } else {
-            set_type_token(vec, PUNCT);
+            Dynamic_Vec_Token_set_type_token(vec, PUNCT);
             fseek(fd, SH_ONE_BK, SEEK_CUR);
             return vec;
         }
     }
 }
 
-struct Dynamic_Vec_Token *
-give_token(struct Dynamic_Vec_Token *vec, FILE *fd)
+Dynamic_Vec_Token *
+Define_Token_define_token(Define_Token *def, Dynamic_Vec_Token *vec)
 {   
     int init = 0;
-    init = fgetc(fd);
+    init = fgetc(def->fd);
     if (init == EOF) {
-        set_type_token(vec, EOF_RET);
+        Dynamic_Vec_Token_set_type_token(vec, EOF_RET);
         return vec;
     }
-    if (add_to_token(vec, init) == NULL) {
+    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
         return NULL;
     }
     if (init == 'u') {
-        init = fgetc(fd);  
+        init = fgetc(def->fd);  
         if (init == EOF) {
-            set_type_token(vec, IDENT);
+            Dynamic_Vec_Token_set_type_token(vec, IDENT);
             return vec;
         }
-        if (add_to_token(vec, init) == NULL) {
+        if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
             return NULL;
         }
         if (init == '8') {    
-            init = fgetc(fd);
+            init = fgetc(def->fd);
             if (init == EOF) {
-                set_type_token(vec, IDENT);
+                Dynamic_Vec_Token_set_type_token(vec, IDENT);
                 return vec;
             }   
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             if (isalpha(init) || isdigit(init) || init == '_' || init == '\\') {
-                return ident_token(vec, fd);
+                return ident_token(vec, def->fd);
             }
             if (init == '\"') {
-                return string_token(vec, fd);
+                return string_token(vec, def->fd);
             }
-            set_type_token(vec, IDENT);
+            Dynamic_Vec_Token_set_type_token(vec, IDENT);
             return vec;   
         }      
         if (isalpha(init) || isdigit(init) || init == '\\' || init == '_') {
-            return ident_token(vec, fd);
+            return ident_token(vec, def->fd);
         }
         if (init == '\'') {
-            return char_token(vec, fd);
+            return char_token(vec, def->fd);
         }
         if (init == '\"') {
-            return string_token(vec, fd);
+            return string_token(vec, def->fd);
         }
-        fseek(fd, SH_ONE_BK, SEEK_CUR);
-        set_type_token(vec, IDENT);
+        fseek(def->fd, SH_ONE_BK, SEEK_CUR);
+        Dynamic_Vec_Token_set_type_token(vec, IDENT);
         return vec;
     }           
     if (memchr(set_id_ch_str, init, SIZE_SET_ID_CH_STR) != NULL) {
-        init = fgetc(fd);
+        init = fgetc(def->fd);
         if (init == EOF) {
-            set_type_token(vec, IDENT);
+            Dynamic_Vec_Token_set_type_token(vec, IDENT);
             return vec;
         }
-        if (add_to_token(vec, init) == NULL) {
+        if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
             return NULL;
         }
         if (isalpha(init) || isdigit(init) || init == '_' || init == '\\') {
-            return ident_token(vec, fd);
+            return ident_token(vec, def->fd);
         }
         if (init == '\'') {
-            return char_token(vec, fd);
+            return char_token(vec, def->fd);
         }
         if (init == '\"') {
-            return string_token(vec, fd);
+            return string_token(vec, def->fd);
         }
-        fseek(fd, SH_ONE_BK, SEEK_CUR);
-        set_type_token(vec, IDENT);
+        fseek(def->fd, SH_ONE_BK, SEEK_CUR);
+        Dynamic_Vec_Token_set_type_token(vec, IDENT);
         return vec;
     }
     if (isalpha(init) || init == '_' || init == '\\') {
-        return ident_token(vec, fd);
+        return ident_token(vec, def->fd);
     }
     if (isdigit(init) && (init != '0')) {
-        return int_dec_token(vec, fd);
+        return int_dec_token(vec, def->fd);
     }
     if (init == '0') {
-        return int_oct_token(vec, fd);
+        return int_oct_token(vec, def->fd);
     }
     if (init == '\'') {
-        return char_token(vec, fd);
+        return char_token(vec, def->fd);
     }
     if (init == '\"') {
-        return string_token(vec, fd);
+        return string_token(vec, def->fd);
     }
     if (init == '/') {
-        init = fgetc(fd);
+        init = fgetc(def->fd);
         if (init == EOF) {
-            set_type_token(vec, PUNCT);
+            Dynamic_Vec_Token_set_type_token(vec, PUNCT);
             return vec;
         }
         if (init == '/') {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
-            return comment_new_token(vec, fd);
+            return comment_new_token(vec, def->fd);
         }  
         if (init == '*') {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
-            return comment_old_token(vec, fd);
+            return comment_old_token(vec, def->fd);
         } 
-        fseek(fd, SH_ONE_BK, SEEK_CUR);
-        set_type_token(vec, PUNCT);
+        fseek(def->fd, SH_ONE_BK, SEEK_CUR);
+        Dynamic_Vec_Token_set_type_token(vec, PUNCT);
         return vec;
     }
     if (memchr(punctuators, init, SIZE_SET_PUNCT) != NULL) {
-        return punct_token(vec, fd);
+        return punct_token(vec, def->fd);
     }
-    set_type_token(vec, NO);
+    Dynamic_Vec_Token_set_type_token(vec, NO);
     return vec;
 }   
 
 static int
-equal_sets(struct Dynamic_Vec_Token *vec, char *set) 
+equal_sets(Dynamic_Vec_Token *vec, char *set) 
 {
-    int end = get_end_token(vec);
+    int end = Dynamic_Vec_Token_get_end_token(vec);
     int data = 0;
     for (int i = 0; i < end; i++) {
-        get_sym_token(vec, i, &data);
+        Dynamic_Vec_Token_get_sym_token(vec, i, &data);
         if(data != set[i]) {
             return FALSE;
         }
@@ -671,7 +671,7 @@ equal_sets(struct Dynamic_Vec_Token *vec, char *set)
 }
 
 static int
-is_key(struct Dynamic_Vec_Token *vec) 
+is_key(Dynamic_Vec_Token *vec) 
 {
     static char uns_word[] = "unsigned";
     static char void_word[] = "void";
@@ -688,7 +688,7 @@ is_key(struct Dynamic_Vec_Token *vec)
     static char stass_word[] = "_Static_assert";
     static char thread_word[] = "_Thread_local";
 
-    switch (get_end_token(vec)) {
+    switch (Dynamic_Vec_Token_get_end_token(vec)) {
     case SIZE_UNS:
         if (equal_sets(vec, uns_word) || equal_sets(vec, comp_word) 
                 || equal_sets(vec, gen_word) || equal_sets(vec, volat_word)
@@ -724,23 +724,23 @@ is_key(struct Dynamic_Vec_Token *vec)
     }
 }
 
-static struct Dynamic_Vec_Token *
-hex_only(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+hex_only(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = fgetc(fd);
     if (!isxdigit(init)) {
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        set_type_token(vec, NO);
+        Dynamic_Vec_Token_set_type_token(vec, NO);
         return vec;
     }
-    if (add_to_token(vec, init) == NULL) {
+    if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
         return NULL;
     }
-    set_type_token(vec, INIT_TYPE);
+    Dynamic_Vec_Token_set_type_token(vec, INIT_TYPE);
     while (TRUE) {
         init = fgetc(fd);
         if (isxdigit(init)) {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
@@ -750,32 +750,32 @@ hex_only(struct Dynamic_Vec_Token *vec, FILE *fd)
     }
 }    
 
-static struct Dynamic_Vec_Token *
-oct_less_eq_3(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+oct_less_eq_3(Dynamic_Vec_Token *vec, FILE *fd)
 {
     int init = 0;
     for (int i = 0; i <= 2; i++) {
         init = fgetc(fd);
         if (isdigit(init) && init != '8' && init != '9') {
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
         } 
         if (i == 0) {
-            set_type_token(vec, NO);
+            Dynamic_Vec_Token_set_type_token(vec, NO);
         } else {
-            set_type_token(vec, INIT_TYPE);
+            Dynamic_Vec_Token_set_type_token(vec, INIT_TYPE);
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
         return vec;
     }
-    set_type_token(vec, INIT_TYPE);
+    Dynamic_Vec_Token_set_type_token(vec, INIT_TYPE);
     return vec;
 }    
 
-static struct Dynamic_Vec_Token *
-u_4_8_hex(struct Dynamic_Vec_Token *vec, FILE *fd)
+static Dynamic_Vec_Token *
+u_4_8_hex(Dynamic_Vec_Token *vec, FILE *fd)
 {
 
     int init = 0;
@@ -784,25 +784,25 @@ u_4_8_hex(struct Dynamic_Vec_Token *vec, FILE *fd)
         init = fgetc(fd);
         if (i == 0) {
             if (init == 'u' || init == 'U') {
-                if (add_to_token(vec, init) == NULL) {
+                if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                     return NULL;
                 }
                 continue;
             }
-            set_type_token(vec, NO);
+            Dynamic_Vec_Token_set_type_token(vec, NO);
             fseek(fd, SH_ONE_BK, SEEK_CUR);
             return vec;
         }
         if (isxdigit(init) && i != 9) {
             counter_hex += 1;
-            if (add_to_token(vec, init) == NULL) {
+            if (Dynamic_Vec_Token_add_to_token(vec, init) == NULL) {
                 return NULL;
             }
             continue;
         } else if (counter_hex % DIV_F == 0 && counter_hex != 0) {
-            set_type_token(vec, INIT_TYPE);        
+            Dynamic_Vec_Token_set_type_token(vec, INIT_TYPE);        
         } else {
-            set_type_token(vec, NO);
+            Dynamic_Vec_Token_set_type_token(vec, NO);
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
         return vec;

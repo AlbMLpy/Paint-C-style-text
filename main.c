@@ -15,25 +15,23 @@ int main(int argc, char ** argv)
         return 1;
     }
     if (*argv[2] == 'p') {
-        
+    
         Painter painter;
-        painter.paint = paint;
-        painter.print_token_in_color = print_token_in_color;
-
+        painter.act.action = (int (*) (Action *, Dynamic_Vec_Token *)) Painter_paint;
         polymorph_action_tokens(fp, (Action*) &painter);
-
+   
     } else if (*argv[2] == 's') {
      
-        Stats_On_Num *stat = init_stats_tokens();
-        if (stat == NULL) {
+        Stat_Token stat;
+        stat.act.action = (int (*) (Action *, Dynamic_Vec_Token *)) Stat_Token_inc_token;
+        if (Stat_Token_init(&stat) == NULL) {
             fprintf(stderr, "%s\n", "Memory error!");
             return 1;
         }
-        
-        polymorph_action_tokens(fp, (Action*) stat);
+        polymorph_action_tokens(fp, (Action*) &stat);
+        Stat_Token_print_stat(&stat);
+        Stat_Token_finalize(&stat);
 
-        print_stat(stat);
-        finalize_stats(stat);        
     } else {
         fclose(fp);
         fprintf(stderr, "Wrong mode!\n");

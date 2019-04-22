@@ -2,14 +2,7 @@
 #include "painter_container.h"
 
 int
-paint(Painter *does, struct Dynamic_Vec_Token *vec)
-{
-    does->print_token_in_color(vec);
-    return 0;
-}    
-
-void
-print_token_in_color(struct Dynamic_Vec_Token *vec)
+Painter_paint(Painter *does, Dynamic_Vec_Token *vec)
 {
     static char *blue_code = "\033[0;34m"; // key words
     static char *pink_code = "\033[0;35m"; // identificators
@@ -19,37 +12,38 @@ print_token_in_color(struct Dynamic_Vec_Token *vec)
     static char *red_code = "\033[0;31m"; // punctuators
     static char *brown_code = "\033[0;33m"; // comments
     
-    switch (get_type_token(vec)) {
+    switch (Dynamic_Vec_Token_get_type_token(vec)) {
     case IDENT:
-        print_cont_in_color(vec, print_token, pink_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, pink_code);
         break;
    
     case KEY:
-        print_cont_in_color(vec, print_token, blue_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, blue_code);
         break;  
     
     case CONST_INT:
-        print_cont_in_color(vec, print_token, orange_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, orange_code);
         break;
 
     case CONST_CHAR:
-        print_cont_in_color(vec, print_token, yellow_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, yellow_code);
         break;
 
     case CONST_STR:
-        print_cont_in_color(vec, print_token, green_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, green_code);
         break;
 
     case COMMENT:
-        print_cont_in_color(vec, print_token, brown_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, brown_code);
         break;
 
     case PUNCT:
-        print_cont_in_color(vec, print_token, red_code);
+        print_cont_in_color(vec, Dynamic_Vec_Token_print_token, red_code);
         break;
 
     default:
-        print_token(vec);
+        Dynamic_Vec_Token_print_token(vec);
     }
+    return 0;
 }   
 

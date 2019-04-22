@@ -1,21 +1,21 @@
 #include "stat_on_num.h"
 #include <stdlib.h>
 
-struct Stats_On_Num *
-init_stats(char type_var, int count)
+Stats_On_Num *
+Stats_On_Num_init_stats(char type_var, int count)
 {
-    struct Stats_On_Num *stat = malloc(sizeof(*stat));
+    Stats_On_Num *stat = malloc(sizeof(*stat));
     if (stat == NULL) {
         return stat;
     }
     stat->counter_var = malloc(sizeof(*(stat->counter_var)));
     if (stat->counter_var == NULL) {
-        finalize_stats(stat);
+        Stats_On_Num_finalize_stats(stat);
         return stat;
     }
     stat->type_var = malloc(sizeof(*(stat->type_var)));
     if (stat->type_var == NULL) {
-        finalize_stats(stat);
+        Stats_On_Num_finalize_stats(stat);
         return stat;
     }
     stat->counter_var[0] = count;
@@ -25,7 +25,7 @@ init_stats(char type_var, int count)
 }    
 
 void
-finalize_stats(struct Stats_On_Num *stat)
+Stats_On_Num_finalize_stats(Stats_On_Num *stat)
 {
     if (stat == NULL) {
         return;
@@ -38,7 +38,7 @@ finalize_stats(struct Stats_On_Num *stat)
 }    
 
 int
-add_var(struct Stats_On_Num *stat, char id_var, int count_var)
+Stats_On_Num_add_var(Stats_On_Num *stat, char id_var, int count_var)
 {
     if (stat == NULL) {
         return -1;
@@ -46,12 +46,12 @@ add_var(struct Stats_On_Num *stat, char id_var, int count_var)
     stat->size++;    
     stat->type_var = realloc(stat->type_var, stat->size);
     if (stat->type_var == NULL) {
-        finalize_stats(stat);
+        Stats_On_Num_finalize_stats(stat);
         return -1;
     }    
     stat->counter_var = realloc(stat->counter_var, sizeof(*(stat->counter_var)) * stat->size);
     if (stat->counter_var == NULL) {
-        finalize_stats(stat);
+        Stats_On_Num_finalize_stats(stat);
         return -1;
     }
     stat->type_var[(stat->size) - 1] = id_var;
@@ -60,7 +60,7 @@ add_var(struct Stats_On_Num *stat, char id_var, int count_var)
 }    
 
 int
-get_var_count(struct Stats_On_Num *stat, char id_var)
+Stats_On_Num_get_var_count(Stats_On_Num *stat, char id_var)
 {
     if (stat == NULL) {
         return -1;
@@ -74,13 +74,13 @@ get_var_count(struct Stats_On_Num *stat, char id_var)
 }
 
 int
-inc_var_count(struct Stats_On_Num *stat, struct Dynamic_Vec_Token *vec)
+Stats_On_Num_inc_var_count(struct Stats_On_Num *stat, char id_var)
 {
     if (stat == NULL) {
         return -1;
     }
     for (int i = 0; i < stat->size; i++) {
-        if (stat->type_var[i] == get_type_token(vec)) {
+        if (stat->type_var[i] == id_var) {
             stat->counter_var[i] += 1;
             return 0;
         }
