@@ -1,4 +1,4 @@
-#include "dyn_vec_token.h"
+#include "Token.h"
 
 /**
  * This type is used to make universal interface for any functionality in the program;
@@ -9,8 +9,8 @@
 
 #ifndef ACTION
 #define ACTION
-struct Action {
-    int (*action) (struct Action *does, Dynamic_Vec_Token *vec);
+class Action {
+public:    
+    virtual int action(Token &vec) = 0;
 };
-typedef struct Action Action;
 #endif

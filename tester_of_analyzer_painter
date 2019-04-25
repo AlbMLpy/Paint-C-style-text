@@ -65,7 +65,3 @@
 ./analyzer ./cover_tests/test31 s;echo "";
 ./analyzer ./cover_tests/test32 s;echo "";
 ./analyzer ./cover_tests/test33 s;echo "";
-
-
-
-
