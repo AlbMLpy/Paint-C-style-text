@@ -1,7 +1,7 @@
 #include "paint_tokens_in_file.h"
 #include "give_stats_tokens_in_file.h"
 #include "polymorph_act.h"
-#include <stdio.h>
+#include <cstdio>
 
 int main(int argc, char ** argv)
 {

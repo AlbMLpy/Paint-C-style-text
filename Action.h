@@ -11,6 +11,6 @@
 #define ACTION
 class Action {
 public:    
-    virtual int action(Token &vec) = 0;
+    virtual int action(Token &token) = 0;
 };
 #endif
