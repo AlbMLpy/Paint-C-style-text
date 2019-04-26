@@ -1,3 +1,5 @@
+#ifndef DYNAMIC_VEC
+#define DYNAMIC_VEC
 /**
  * This is a dynamic container for int values with interface below;
  */
@@ -41,4 +43,4 @@ public:
  */   
     int print_text(int begin, int end) const;
 };
-
+#endif

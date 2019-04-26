@@ -1,3 +1,5 @@
+#ifndef TOKEN
+#define TOKEN
 #include "Dynamic_Vec.h"
 
 //These constants are essential to define token type
@@ -57,4 +59,4 @@ public:
  */
     void print() const;
 };
-
+#endif
