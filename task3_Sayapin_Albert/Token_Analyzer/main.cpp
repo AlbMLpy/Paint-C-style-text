@@ -1,7 +1,24 @@
 #include "Painter.h"
-#include "Counter_Token.h"
-#include "polymorph_action_tokens.h"
+#include "TokenCounter.h"
 #include <cstdio>
+#include "Analyzer.h"
+#include "Action.h"
+#include <iostream>
+
+using std::cout;
+
+void
+polymorph_action_tokens(FILE *fd, Action &action)
+{
+    TokenType type = NONE;
+    Analyzer analyzer(fd);
+    do {
+        Token token = analyzer.get_token();
+        cout << action.action(token);
+        type = token.get_type();
+    } while (type != EOF_RET);
+    return;
+}    
 
 int main(int argc, char ** argv)
 {
@@ -21,9 +38,18 @@ int main(int argc, char ** argv)
    
     } else if (*argv[2] == 's') {
      
-        Counter_Token token_stat;
-        polymorph_action_tokens(fp, token_stat);
-        token_stat.print_stat();
+        TokenCounter token_counter;
+        polymorph_action_tokens(fp, token_counter);
+
+        printf("\nSTATISTICS ON FILE:\n");
+        printf("\nstrange_tok = %d", token_counter[NONE]);
+        printf("\nint_tok = %d", token_counter[CONST_INT]);
+        printf("\nkey_tok = %d", token_counter[KEY]);
+        printf("\nchar_tok = %d", token_counter[CONST_CHAR]);
+        printf("\nstr_tok = %d", token_counter[CONST_STR]);
+        printf("\nident_tok = %d", token_counter[IDENT]);
+        printf("\ncomment_tok = %d", token_counter[COMMENT]);
+        printf("\npunct_tok = %d\n", token_counter[PUNCT]);       
 
     } else {
         fclose(fp);

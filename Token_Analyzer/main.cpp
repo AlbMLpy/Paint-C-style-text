@@ -1,7 +1,19 @@
 #include "Painter.h"
-#include "Counter_Token.h"
-#include "polymorph_action_tokens.h"
+#include "TokenCounter.h"
 #include <cstdio>
+#include "Analyzer.h"
+#include "Action.h"
+
+void
+polymorph_action_tokens(FILE *fd, Action &action)
+{   
+    Analyzer analyzer(fd);
+    do {
+        Token token = analyzer.get_token();
+        cout << action.action(token);        
+    } while (token.get_type() != EOF_RET);
+    return;
+}
 
 int main(int argc, char ** argv)
 {

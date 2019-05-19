@@ -9,7 +9,7 @@
 #define ACTION
 class Action {
 public:    
-    virtual int action(Token &token) = 0;
+    virtual string action(Token &token) = 0;
     virtual ~Action(){};
 };
 #endif

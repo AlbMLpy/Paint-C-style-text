@@ -1,4 +1,4 @@
-#include "Define_Token.h"
+#include "Analyzer.h"
 #include <cstring>
 #include <cctype>
 
@@ -23,70 +23,70 @@ static char simple_escape[] = { '\'', '\"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define integer decimal constant like token 
  * and to put into Token;
  */
-void
-Define_Token::int_dec_token(Token &token)
+Token
+Analyzer::int_dec_token(string &buffer)
 {
     int init = 0;
     while (TRUE) {       
         init = fgetc(fd);
         if (isdigit(init)) {
-            token.add_to(init);
+            buffer += init;
             continue;
         } else {
-            token.set_type(CONST_INT);
+            Token token(buffer, CONST_INT);
             fseek(fd, SH_ONE_BK, SEEK_CUR);   
-            return;
+            return token;
         }
     }        
 }   
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define integer octal constant like token 
  * and to put into Token;
  */
-void
-Define_Token::int_oct_token(Token &token)
+Token
+Analyzer::int_oct_token(string &buffer)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (isdigit(init) && init != '9' && init != '8') {
-            token.add_to(init);
+            buffer += init;
             continue;
         } else {
-            token.set_type(CONST_INT);
+            Token token(buffer, CONST_INT);
             fseek(fd, SH_ONE_BK, SEEK_CUR);
-            return;
+            return token;
         }           
     }
 }   
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define character constant like token 
  * and to put into Token;
  */
-void
-Define_Token::char_token(Token &token)
+Token
+Analyzer::char_token(string &buffer)
 {   
     int init = 0;
     int state_begin = 0;    
     init = fgetc(fd);
     if (init == '\'' || init == '\n') {
-        token.add_to(init);
-        token.set_type(NO);
-        return;
+        buffer += init;
+        Token token(buffer, NONE);
+        return token;
     }   
     if (init == EOF) {
-        token.set_type(NO);
-        return;
+        Token token(buffer, NONE);
+        return token;
     }
     while (TRUE) {
         if (state_begin) {
@@ -95,56 +95,58 @@ Define_Token::char_token(Token &token)
         state_begin++;
         switch (init) {
         case '\'':
-            token.add_to(init);
-            token.set_type(CONST_CHAR);
-            return;
+            { 
+                buffer += init;
+                Token token(buffer, CONST_CHAR);
+                return token;
+            }
         case '\\':
-            token.add_to(init);
+            buffer += init;
             init = fgetc(fd);
             switch (init) {
             case 'U':
             case 'u':
                 fseek(fd, SH_ONE_BK, SEEK_CUR);   
-                u_4_8_hex(token);
-                if (token.get_type() != INIT_TYPE) {
-                    return;
+                if (u_4_8_hex(buffer) == false) {
+                    Token token(buffer, NONE);
+                    return token;
                 }
                 continue;
             case 'x':
-                token.add_to(init);
-                hex_only(token);
-                if (token.get_type() != INIT_TYPE) {
-                    return;
+                buffer += init;
+                if (hex_only(buffer) == false) {
+                    Token token(buffer, NONE);
+                    return token;
                 }
                 continue;
             default:
                 if (isdigit(init) && init != '8' && init != '9') {
                     fseek(fd, SH_ONE_BK, SEEK_CUR);
-                    oct_less_eq_3(token);
-                    if (token.get_type() != INIT_TYPE) {
-                        return;
+                    if (oct_less_eq_3(buffer) == false) {
+                        Token token(buffer, NONE);
+                        return token;
                     }
                     continue;
                 } else if (memchr(simple_escape, init, SIZE_SET_SIM_ESC) != NULL) {
-                    token.add_to(init);
+                    buffer += init;
                     continue;
                 } else {
                     fseek(fd, SH_ONE_BK, SEEK_CUR);
-                    token.set_type(NO);
-                    return;
+                    Token token(buffer, NONE);
+                    return token;
                 }
             }
         default:
             if (init == EOF) {
-                token.set_type(NO);
-                return;
+                Token token(buffer, NONE);
+                return token;
             }
             if (init == '\n') {
-                token.add_to(init);
-                token.set_type(NO);
-                return;
+                buffer += init;
+                Token token(buffer, NONE);
+                return token;
             }  
-            token.add_to(init);
+            buffer += init;
             continue;  
         }
     }
@@ -152,67 +154,69 @@ Define_Token::char_token(Token &token)
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define string constant like token 
  * and to put into Token;
  */
-void
-Define_Token::string_token(Token &token)
+Token
+Analyzer::string_token(string &buffer)
 {
     int init = 0;    
     while (TRUE) {
         init = fgetc(fd);
         switch (init) {
         case '\"':
-            token.add_to(init);
-            token.set_type(CONST_STR);
-            return;
+            {
+                buffer += init;
+                Token token(buffer, CONST_STR);
+                return token;
+            }    
         case '\\':
-            token.add_to(init);
+            buffer += init;
             init = fgetc(fd);
             switch (init) {
             case 'U':
             case 'u':
                 fseek(fd, SH_ONE_BK, SEEK_CUR);   
-                u_4_8_hex(token);
-                if (token.get_type() != INIT_TYPE) {
-                    return;
+                if (u_4_8_hex(buffer) == false) {
+                    Token token(buffer, NONE);
+                    return token;
                 }
                 continue;
             case 'x':
-                token.add_to(init);
-                hex_only(token);
-                if (token.get_type() != INIT_TYPE) {
-                    return;
+                buffer += init;
+                if (hex_only(buffer) == false) {
+                    Token token(buffer, NONE);
+                    return token;
                 }
                 continue;
             default:
                 if (isdigit(init) && init != '8' && init != '9') {
                     fseek(fd, SH_ONE_BK, SEEK_CUR);
-                    oct_less_eq_3(token);
-                    if (token.get_type() != INIT_TYPE) {
-                        return;
+                    if (oct_less_eq_3(buffer) == false) {
+                        Token token(buffer, NONE);
+                        return token;
                     }
                     continue;
                 } else if (memchr(simple_escape, init, SIZE_SET_SIM_ESC) != NULL) {
-                    token.add_to(init);
+                    buffer += init;
                     continue;
                 } else {
-                    token.set_type(NO);
-                    return;
+                    Token token(buffer, NONE);
+                    return token;
                 }
             }
         default:
             if (init == EOF) {
-                token.set_type(NO);
-                return;
+                Token token(buffer, NONE);
+                return token;
             }
             if (init == '\n') {
-                token.add_to(init);
-                token.set_type(NO);
-                return;
+                buffer += init;
+                Token token(buffer, NONE);
+                return token;
             }
-            token.add_to(init);
+            buffer += init;
             continue;  
         }
     }
@@ -220,37 +224,39 @@ Define_Token::string_token(Token &token)
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define identificator like token 
  * and to put into Token;
  */
-void
-Define_Token::ident_token(Token &token)
+Token
+Analyzer::ident_token(string &buffer)
 { 
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         switch (init) {
         case '\\':
-            token.add_to(init);
-            u_4_8_hex(token);
-            if (token.get_type() != INIT_TYPE) {
-                return;
+            buffer += init;
+            if (u_4_8_hex(buffer) == false) {
+                Token token(buffer, NONE);
+                return token;
             }
             break;
         default:
+            TokenType type = KEY;
             if (isalpha(init) || isdigit(init) || init == '_') {
-                token.add_to(init);
+                buffer += init;
             } else {   
-                if (is_key(token)) {
-                    token.set_type(KEY);
+                if (is_key(buffer)) {
+                    type = KEY;
                 } else {
-                    token.set_type(IDENT); 
+                    type = IDENT; 
                 }  
                 if (init != EOF) {
                     fseek(fd, SH_ONE_BK, SEEK_CUR);
                 }
-                return;
+                Token token(buffer, type);
+                return token;
             }   
         }
     }       
@@ -258,69 +264,69 @@ Define_Token::ident_token(Token &token)
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define comment new style like token 
  * and to put into Token;
  */
-void
-Define_Token::comment_new_token(Token &token)
+Token
+Analyzer::comment_new_token(string &buffer)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (init != '\n') {
             if (init == EOF) {
-                token.set_type(NO);
-                return;
+                Token token(buffer, NONE);
+                return token;
             }   
-            token.add_to(init);
+            buffer += init;
             continue;
         } else {
-            token.add_to(init);
-            token.set_type(COMMENT);
-            return;
+            buffer += init;
+            Token token(buffer, COMMENT);
+            return token;
         }
     }
 }   
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define comment old style like token 
  * and to put into Token;
  */
-void
-Define_Token::comment_old_token(Token &token)
+Token
+Analyzer::comment_old_token(string &buffer)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (init != '*') {
             if (init == EOF) {
-                token.set_type(NO);
-                return;
+                Token token(buffer, NONE);
+                return token;
             }   
-            token.add_to(init);
+            buffer += init;
             continue;
         } else {
-            token.add_to(init);
+            buffer += init;
             while (TRUE) {
                 init = fgetc(fd);
                 if (init == '*') {
-                    token.add_to(init);
+                    buffer += init;
                     continue;
                 }
                 if (init != '/') {
                     if (init == EOF) {
-                        token.set_type(NO);
-                        return;
+                        Token token(buffer, NONE);
+                        return token;
                     }       
-                    token.add_to(init);
+                    buffer += init;
                     break;
                 } else {
-                    token.add_to(init);
-                    token.set_type(COMMENT);
-                    return;
+                    buffer += init;
+                    Token token(buffer, COMMENT);
+                    return token;
                 }
             }
             continue;
@@ -330,290 +336,249 @@ Define_Token::comment_old_token(Token &token)
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * This function is used to define punctuator like token 
  * and to put into Token;
  */
-void
-Define_Token::punct_token(Token &token)
+Token
+Analyzer::punct_token(string &buffer)
 {
     int init = 0;
     while (TRUE) {
         init = fgetc(fd);
         if (memchr(punctuators, init, SIZE_SET_PUNCT) != NULL) {
-            token.add_to(init);
+            buffer += init;
         } else {
-            token.set_type(PUNCT);
+            Token token(buffer, PUNCT);
             fseek(fd, SH_ONE_BK, SEEK_CUR);
-            return;
+            return token;
         }
     }
 }
 
-void
-Define_Token::define_token(Token &token)
+Token
+Analyzer::get_token()
 {   
+    string buffer;
     int init = 0;
     init = fgetc(fd);
     if (init == EOF) {
-        token.set_type(EOF_RET);
-        return;
+        Token token(buffer, EOF_RET);
+        return token;
     }
-    token.add_to(init);
+    buffer += init;
     if (init == 'u') {
         init = fgetc(fd);  
         if (init == EOF) {
-            token.set_type(IDENT);
-            return;
+            Token token(buffer, IDENT);
+            return token;
         }
-        token.add_to(init);
+        buffer += init;
         if (init == '8') {    
             init = fgetc(fd);
             if (init == EOF) {
-                token.set_type(IDENT);
-                return;
+                Token token(buffer, IDENT);
+                return token;
             }   
-            token.add_to(init);
+            buffer += init;
             if (isalpha(init) || isdigit(init) || init == '_' || init == '\\') {
-                ident_token(token);
-                return;
+                return ident_token(buffer);
             }
             if (init == '\"') {
-                string_token(token);
-                return;
+                return string_token(buffer);
             }
-            token.set_type(IDENT);
-            return;   
+            Token token(buffer, IDENT);
+            return token;   
         }      
         if (isalpha(init) || isdigit(init) || init == '\\' || init == '_') {
-            ident_token(token);
-            return;
+            return ident_token(buffer);
         }
         if (init == '\'') {
-            char_token(token);
-            return;
+            return char_token(buffer);
         }
         if (init == '\"') {
-            string_token(token);
-            return;
+            return string_token(buffer);
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        token.set_type(IDENT);
-        return;
+        Token token(buffer, IDENT);
+        return token;
     }           
     if (memchr(set_id_ch_str, init, SIZE_SET_ID_CH_STR) != NULL) {
         init = fgetc(fd);
         if (init == EOF) {
-            token.set_type(IDENT);
-            return;
+            Token token(buffer, IDENT);
+            return token;
         }
-        token.add_to(init);
+        buffer += init;
         if (isalpha(init) || isdigit(init) || init == '_' || init == '\\') {
-            ident_token(token);
-            return;
+            return ident_token(buffer);
         }
         if (init == '\'') {
-            char_token(token);
-            return;
+            return char_token(buffer);
         }
         if (init == '\"') {
-            string_token(token);
-            return;
+            return string_token(buffer);
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        token.set_type(IDENT);
-        return;
+        Token token(buffer, IDENT);
+        return token;
     }
     if (isalpha(init) || init == '_' || init == '\\') {
-        ident_token(token);
-        return;
+        return ident_token(buffer);
     }
     if (isdigit(init) && (init != '0')) {
-        int_dec_token(token);
-        return;
+        return int_dec_token(buffer);
     }
     if (init == '0') {
-        int_oct_token(token);
-        return;
+        return int_oct_token(buffer);
     }
     if (init == '\'') {
-        char_token(token);
-        return;
+        return char_token(buffer);
     }
     if (init == '\"') {
-        string_token(token);
-        return;
+        return string_token(buffer);
     }
     if (init == '/') {
         init = fgetc(fd);
         if (init == EOF) {
-            token.set_type(PUNCT);
-            return;
+            Token token(buffer, PUNCT);
+            return token;
         }
         if (init == '/') {
-            token.add_to(init);
-            comment_new_token(token);
-            return;
+            buffer += init;
+            return comment_new_token(buffer);
         }  
         if (init == '*') {
-            token.add_to(init);
-            comment_old_token(token);
-            return;
+            buffer += init;
+            return comment_old_token(buffer);
         } 
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        token.set_type(PUNCT);
-        return;
+        Token token(buffer, PUNCT);
+        return token;
     }
     if (memchr(punctuators, init, SIZE_SET_PUNCT) != NULL) {
-        punct_token(token);
-        return;
+        return punct_token(buffer);
     }
-    token.set_type(NO);
-    return;
+    Token token(buffer, NONE);
+    return token;
 }   
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
- *    - "set" is a pointer on set that is of the same size as token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * Output parameters:
- *    - returns 1 if sets are equal;
- *    - returns 0 if sets are not equal;
- * Description: 
- *    This function compares two sets of equal size;
- */
-int
-Define_Token::equal_sets(Token &token, char *set) 
-{
-    int end = token.get_end();
-    for (int i = 0; i < end; i++) {
-        if(token.get_symbol(i) != set[i]) {
-            return FALSE;
-        }
-    }
-    return TRUE;
-}
-
-/**
- * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
- * Output parameters:
- *    - returns 1 if token is equal to key token;
- *    - returns 0 if token is not equal to key token;
+ *    - returns true if buffer is equal to key token;
+ *    - returns false if buffer is not equal to key token;
  * Description: 
  *    This function check if input token is a key token;
  */
-int
-Define_Token::is_key(Token &token) 
+bool
+Analyzer::is_key(string &buffer) 
 {
-    static char uns_word[] = "unsigned";
-    static char void_word[] = "void";
-    static char volat_word[] = "volatile";
-    static char while_word[] = "while";
-    static char alas_word[] = "_Alignas";
-    static char alof_word[] = "_Alignof";
-    static char atom_word[] = "_Atomic";
-    static char bool_word[] = "_Bool";
-    static char comp_word[] = "_Complex";
-    static char gen_word[] = "_Generic";
-    static char imag_word[] = "_Imaginary";
-    static char noret_word[] = "_Noreturn";
-    static char stass_word[] = "_Static_assert";
-    static char thread_word[] = "_Thread_local";
+    static string uns_word("unsigned");
+    static string void_word("void");
+    static string volat_word("volatile");
+    static string while_word("while");
+    static string alas_word("_Alignas");
+    static string alof_word("_Alignof");
+    static string atom_word("_Atomic");
+    static string bool_word("_Bool");
+    static string comp_word("_Complex");
+    static string gen_word("_Generic");
+    static string imag_word("_Imaginary");
+    static string noret_word("_Noreturn");
+    static string stass_word("_Static_assert");
+    static string thread_word("_Thread_local");
 
-    switch (token.get_end()) {
+    switch (buffer.size()) {
     case SIZE_UNS:
-        if (equal_sets(token, uns_word) || equal_sets(token, comp_word) 
-                || equal_sets(token, gen_word) || equal_sets(token, volat_word)
-                || equal_sets(token, alas_word) || equal_sets(token, alof_word)) {
-            return TRUE;
+        if (buffer == uns_word || buffer == comp_word 
+                || buffer == gen_word || buffer == volat_word
+                || buffer == alas_word || buffer == alof_word) {
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
 
     case SIZE_VOID:
-        return equal_sets(token, void_word);
+        return buffer == void_word;
 
     case SIZE_ATOM:
-        return equal_sets(token, atom_word);
+        return buffer == atom_word;
  
     case SIZE_BOOL:
-        return (equal_sets(token, bool_word) || equal_sets(token, while_word));
+        return (buffer == bool_word || buffer == while_word);
  
     case SIZE_IMAG:
-        return equal_sets(token, imag_word);
+        return buffer == imag_word;
  
     case SIZE_NORET:
-        return equal_sets(token, noret_word);
+        return buffer == noret_word;
  
     case SIZE_STASS:
-        return equal_sets(token, stass_word);
+        return buffer == stass_word;
  
     case SIZE_THR:
-        return equal_sets(token, thread_word);
+        return buffer == thread_word;
     
     default:
-        return FALSE;       
+        return false;       
     }
 }
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * Description:
- *    This function sets type of token: INIT_TYPE if token is regular,
- *    NO in contrast;
- *    It pulls only heximal digits into token else token type=NO;
+ *    This function returns true if token is regular and false if it is not.
  */
-void
-Define_Token::hex_only(Token &token)
+bool
+Analyzer::hex_only(string &buffer)
 {
     int init = fgetc(fd);
     if (!isxdigit(init)) {
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        token.set_type(NO);
-        return;
+        return false;
     }
-    token.add_to(init);
-    token.set_type(INIT_TYPE);
+    buffer += init;
     while (TRUE) {
         init = fgetc(fd);
         if (isxdigit(init)) {
-            token.add_to(init);
+            buffer += init;
             continue;
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        return;    
+        return true;    
     }
 }    
 
 /**
  * Input parameters:
- *    - "token" is a reference on previously initialized object of type Token;
+ *    - "buffer" is a reference on previously initialized object of type string;
  * Description:
- *    This function sets type of token: INIT_TYPE if token is regular, NO in contrast;
- *    It pulls only 0 < x <= 3 octuple digits into token else token type=NO;
+ *    This function returns true if token is regular, false in contrast;
+ *    It pulls only 0 < x <= 3 octuple digits into buffer;
  */
-void
-Define_Token::oct_less_eq_3(Token &token)
+bool
+Analyzer::oct_less_eq_3(string &buffer)
 {
     int init = 0;
     for (int i = 0; i <= 2; i++) {
+        bool flag = true;
         init = fgetc(fd);
         if (isdigit(init) && init != '8' && init != '9') {
-            token.add_to(init);
+            buffer += init;
             continue;
         } 
         if (i == 0) {
-            token.set_type(NO);
+            flag = false;
         } else {
-            token.set_type(INIT_TYPE);
+            flag = true;
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        return;
+        return flag;
     }
-    token.set_type(INIT_TYPE);
-    return;
+    return true;
 }    
 
 /**
@@ -623,44 +588,39 @@ Define_Token::oct_less_eq_3(Token &token)
  *    This function sets type of token: INIT_TYPE if token is regular, NO in contrast;
  *    It pulls only 4 or 8 heximal digits into token else token type=NO;
  */
-void
-Define_Token::u_4_8_hex(Token &token)
+bool
+Analyzer::u_4_8_hex(string &buffer)
 {
-
+    bool flag = true;
     int init = 0;
     int counter_hex = 0;
     for (int i = 0; i <= 9; i++) {
         init = fgetc(fd);
         if (i == 0) {
             if (init == 'u' || init == 'U') {
-                token.add_to(init);
+                buffer += init;
                 continue;
             }
-            token.set_type(NO);
             fseek(fd, SH_ONE_BK, SEEK_CUR);
-            return;
+            return false;
         }
         if (isxdigit(init) && i != 9) {
             counter_hex += 1;
-            token.add_to(init);
+            buffer += init;
             continue;
         } else if (counter_hex % DIV_F == 0 && counter_hex != 0) {
-            token.set_type(INIT_TYPE);        
+            flag = true;        
         } else {
-            token.set_type(NO);
+            flag = false;
         }
         fseek(fd, SH_ONE_BK, SEEK_CUR);
-        return;
+        return flag;
     }
-    return;
+    return true;
 }
 
-Define_Token::Define_Token(FILE *fp)
+Analyzer::Analyzer(FILE *fp)
 { 
     fd = fp;
 }
 
-Define_Token::~Define_Token()
-{
-    
-}
